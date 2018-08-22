@@ -23,6 +23,10 @@ docker_build_params: &docker_build_params
     description: "Path to the Dockerfile"
     type: string
     default: "."
+  addLabels:
+    description: "Add default schema labels"
+    type: boolean
+    default: false
   baseTag:
     description: "Docker base tag to use"
     type: string
@@ -32,6 +36,16 @@ docker_tags_params: &docker_tags_params
   tags:
     description: "Either one or multiple comma-separated Docker tags to apply and push"
     type: string
+
+docker_build_args: &docker_build_args
+  # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
+  useArgs: << parameters.useArgs >>
+  args: << parameters.args >>
+  path: << parameters.path >>
+  baseTag: << parameters.baseTag >>
+  attach: << parameters.attach >>
+  attachAt: << parameters.attachAt >>
+  addLabels: << parameters.addLabels >>
 
 orbs:
   dockerorb:
@@ -85,25 +99,51 @@ orbs:
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
             # matches: ['([a-zA-Z][\w]*=[\w-\/.:]+)(,[a-zA-Z][\w]*=[\w-\/.:]+)*', "<< parameters.args >>"]
             steps:
-            - run:
-                name: Build Docker image with arguments
-                command: |
-                  buildarg=""
-                  args="<< parameters.args >>"
-                  for arg in $args; do
-                    buildarg="${buildarg} --build-arg ${arg}"
-                  done
-                  build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>"
-                  eval $build
+            - when:
+                condition: << parameters.addLabels >>
+                steps:
+                - run:
+                    name: Build Docker image with arguments and labels
+                    command: |
+                      buildarg=""
+                      args="<< parameters.args >>,BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"`,VCS_REF=`git rev-parse --short HEAD`"
+                      for arg in $args; do
+                        buildarg="${buildarg} --build-arg ${arg}"
+                      done
+                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>"
+                      eval $build
+            - unless:
+                condition: << parameters.addLabels >>
+                steps:
+                - run:
+                    name: Build Docker image with arguments and without labels
+                    command: |
+                      buildarg=""
+                      args="<< parameters.args >>"
+                      for arg in $args; do
+                        buildarg="${buildarg} --build-arg ${arg}"
+                      done
+                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>"
+                      eval $build
         - unless:
             condition: << parameters.useArgs >>
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
             # matches: ['([a-zA-Z][\w]*=[\w-\/.:]+)(,[a-zA-Z][\w]*=[\w-\/.:]+)*', "<< parameters.args >>"]
             steps:
-            - run:
-                name: Build Docker image without arguments
-                command: |
-                  docker build --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>
+            - when:
+                condition: << parameters.addLabels >>
+                steps:
+                - run:
+                    name: Build Docker image without arguments and with labels
+                    command: |
+                      docker build --build-arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build-arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>
+            - unless:
+                condition: << parameters.addLabels >>
+                steps:
+                - run:
+                    name: Build Docker image without arguments and without labels
+                    command: |
+                      docker build --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>
         - run:
             name: Save Docker image layer cache
             command: |
@@ -175,13 +215,7 @@ orbs:
           <<: *docker_build_params
         steps:
         - build:
-            # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-            useArgs: << parameters.useArgs >>
-            args: << parameters.args >>
-            path: << parameters.path >>
-            baseTag: << parameters.baseTag >>
-            attach: << parameters.attach >>
-            attachAt: << parameters.attachAt >>
+            <<: *docker_build_args
 
       build-test:
         description: "Build Docker image"
@@ -197,13 +231,7 @@ orbs:
             default: "docker-compose.test.yml"
         steps:
         - build:
-            # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-            useArgs: << parameters.useArgs >>
-            args: << parameters.args >>
-            path: << parameters.path >>
-            baseTag: << parameters.baseTag >>
-            attach: << parameters.attach >>
-            attachAt: << parameters.attachAt >>
+            <<: *docker_build_args
         - tag:
             tags: << parameters.tags >>
             baseTag: << parameters.baseTag >>
@@ -229,13 +257,7 @@ orbs:
             default: master
         steps:
         - build:
-            # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-            useArgs: << parameters.useArgs >>
-            args: << parameters.args >>
-            path: << parameters.path >>
-            baseTag: << parameters.baseTag >>
-            attach: << parameters.attach >>
-            attachAt: << parameters.attachAt >>
+            <<: *docker_build_args
         - when:
             condition: true
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
@@ -272,13 +294,7 @@ orbs:
             default: "docker-compose.test.yml"
         steps:
         - build:
-            # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-            useArgs: << parameters.useArgs >>
-            args: << parameters.args >>
-            path: << parameters.path >>
-            baseTag: << parameters.baseTag >>
-            attach: << parameters.attach >>
-            attachAt: << parameters.attachAt >>
+            <<: *docker_build_args
         - when:
             condition: true
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
@@ -295,31 +311,30 @@ orbs:
                 tags: << parameters.tags >>
                 branch: << parameters.branch >>
 
+golang_docker: &golang_docker
+  context: docker-hub
+    # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
+    useArgs: true
+    baseTag: golang
+    addLabels: true
+    login:
+    - run:
+        name: Login to Docker Hub
+        command: |
+          docker login -u $DOCKER_USR -p $DOCKER_PWD
+
 version: 2.1
 workflows:
   build:
     jobs:
     - dockerorb/build-test-push:
-        context: docker-hub
-        # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-        useArgs: true
-        args: "GOVERSION=1.10.3,BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"`,VCS_REF=`git rev-parse --short HEAD`"
-        baseTag: golang
+        <<: *golang_docker
+        args: "GOVERSION=1.10.3"
         tags: "gofunky/golang:1.10.3,gofunky/golang:1.10"
-        login:
-        - run:
-            name: Login to Docker Hub
-            command: |
-              docker login -u $DOCKER_USR -p $DOCKER_PWD
     - dockerorb/build-test-push:
-        context: docker-hub
-        # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-        useArgs: true
-        args: "GOVERSION=1.9.7,BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"`,VCS_REF=`git rev-parse --short HEAD`"
-        baseTag: golang
+        <<: *golang_docker
+        args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7,gofunky/golang:1.9"
-        login:
-        - run:
-            name: Login to Docker Hub
-            command: |
-              docker login -u $DOCKER_USR -p $DOCKER_PWD
+    - dockerorb/build-test-push:
+        <<: *golang_docker
+        tags: "gofunky/golang:latest"
