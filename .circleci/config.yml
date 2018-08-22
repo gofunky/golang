@@ -7,6 +7,7 @@ docker_arg_params: &docker_arg_params
   args:
     description: "Either none, one or multiple comma-separated Docker build arguments to apply"
     type: string
+    default: ""
 
 docker_attach_params: &docker_attach_params
   attach:
