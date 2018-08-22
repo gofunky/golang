@@ -313,15 +313,15 @@ orbs:
 
 golang_docker: &golang_docker
   context: docker-hub
-    # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-    useArgs: true
-    baseTag: golang
-    addLabels: true
-    login:
-    - run:
-        name: Login to Docker Hub
-        command: |
-          docker login -u $DOCKER_USR -p $DOCKER_PWD
+  # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
+  useArgs: true
+  baseTag: golang
+  addLabels: true
+  login:
+  - run:
+      name: Login to Docker Hub
+      command: |
+        docker login -u $DOCKER_USR -p $DOCKER_PWD
 
 version: 2.1
 workflows:
