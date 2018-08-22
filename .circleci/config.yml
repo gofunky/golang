@@ -311,3 +311,15 @@ workflows:
             name: Login to Docker Hub
             command: |
               docker login -u $DOCKER_USR -p $DOCKER_PWD
+    - dockerorb/build-test-push:
+        context: docker-hub
+        # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
+        useArgs: true
+        args: "GOVERSION=1.9.7,BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"`,VCS_REF=`git rev-parse --short HEAD`"
+        baseTag: golang
+        tags: "gofunky/golang:1.9.7,gofunky/golang:1.9"
+        login:
+        - run:
+            name: Login to Docker Hub
+            command: |
+              docker login -u $DOCKER_USR -p $DOCKER_PWD
