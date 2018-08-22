@@ -339,3 +339,5 @@ workflows:
     - dockerorb/build-test-push:
         <<: *golang_docker
         tags: "gofunky/golang:latest"
+        # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
+        useArgs: false
