@@ -1,7 +1,6 @@
 version: '3.7'
 services:
   sut:
-    image: golang
-    volumes:
-    - .:/app:cached
+    build: .
+    dockerfile: Dockerfile.sut
     command: /app/sut.sh

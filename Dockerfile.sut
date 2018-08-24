@@ -1,0 +1,4 @@
+FROM golang
+MAINTAINER matfax <mat@fax.fyi>
+
+ADD ./sut.sh /app
