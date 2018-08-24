@@ -10,7 +10,7 @@ RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 RUN go get github.com/jstemmer/go-junit-report
 RUN go get github.com/haya14busa/goverage
 RUN go get github.com/schrej/godacov
-COPY /usr/local/bin/fossa /usr/local/bin/fossa
+COPY ./fossa /usr/local/bin/fossa
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/gofunky/golang" \
