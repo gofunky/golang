@@ -4,4 +4,5 @@ dep version
 go-junit-report --help
 goverage --help
 godacov --help
-fossa --version
+# TODO Add Muslc Fossa
+# fossa --version
