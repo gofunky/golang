@@ -24,6 +24,10 @@ docker_build_params: &docker_build_params
     description: "Path to the Dockerfile"
     type: string
     default: "Dockerfile"
+  cache:
+    description: "Use image layer cache"
+    type: boolean
+    default: true
   path:
     description: "Build path"
     type: string
@@ -90,11 +94,14 @@ orbs:
             steps:
             - attach_workspace:
                 at: << parameters.attachAt >>
-        - restore_cache:
-            keys:
-            - docker-{{ .Branch }}
-            paths:
-            - /caches/<< parameters.baseTag >>.tar
+        - when:
+            condition: << parameters.cache >>
+            steps:
+            - restore_cache:
+                keys:
+                - docker-{{ .Branch }}
+                paths:
+                - /caches/<< parameters.baseTag >>.tar
         - run:
             name: Load Docker image layer cache
             command: |
@@ -150,15 +157,18 @@ orbs:
                     name: Build Docker image without arguments and without labels
                     command: |
                       docker build --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>
-        - run:
-            name: Save Docker image layer cache
-            command: |
-              mkdir -p /caches
-              docker save -o /caches/<< parameters.baseTag >>.tar << parameters.baseTag >>
-        - save_cache:
-            key: docker-{{ .Branch }}-{{ epoch }}
-            paths:
-            - /caches/<< parameters.baseTag >>.tar
+        - when:
+            condition: << parameters.cache >>
+            steps:
+            - run:
+                name: Save Docker image layer cache
+                command: |
+                  mkdir -p /caches
+                  docker save -o /caches/<< parameters.baseTag >>.tar << parameters.baseTag >>
+            - save_cache:
+                key: docker-{{ .Branch }}-{{ epoch }}
+                paths:
+                - /caches/<< parameters.baseTag >>.tar
       tag:
         parameters:
           <<: *docker_tags_params
@@ -359,25 +369,30 @@ workflows:
         args: "GOVERSION=1.10.3"
         tags: "gofunky/golang:1.10.3-circleci"
         file: "Dockerfile.circleci"
+        cache: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7-circleci"
         file: "Dockerfile.circleci"
+        cache: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.10"
         tags: "gofunky/golang:1.10-circleci"
         file: "Dockerfile.circleci"
+        cache: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.9"
         tags: "gofunky/golang:1.9-circleci"
         file: "Dockerfile.circleci"
+        cache: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         tags: "gofunky/golang:circleci"
         file: "Dockerfile.circleci"
+        cache: false
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
     - dockerorb/build-test-push:
