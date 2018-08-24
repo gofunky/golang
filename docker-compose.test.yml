@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   sut:
-    build: .
-    dockerfile: Dockerfile.sut
+    build:
+      context: .
+      dockerfile: Dockerfile.sut
     command: /app/sut.sh
