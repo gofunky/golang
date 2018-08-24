@@ -100,7 +100,7 @@ orbs:
             steps:
             - restore_cache:
                 keys:
-                - docker-{{ .Branch }}
+                - docker-<< parameters.path >>-<< parameters.file >>-{{ .Branch }}
                 paths:
                 - /caches/<< parameters.baseTag >>.tar
             - run:
@@ -167,7 +167,7 @@ orbs:
                   mkdir -p /caches
                   docker save -o /caches/<< parameters.baseTag >>.tar << parameters.baseTag >>
             - save_cache:
-                key: docker-{{ .Branch }}-{{ epoch }}
+                key: docker-<< parameters.path >>-<< parameters.file >>-{{ .Branch }}-{{ epoch }}
                 paths:
                 - /caches/<< parameters.baseTag >>.tar
       tag:
