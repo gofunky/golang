@@ -2,7 +2,10 @@ version: '3.7'
 services:
   sut:
     image: golang
-    command: |
+    command:
+    - /bin/sh
+    - -c
+    - |
       go version
       dep version
       go-junit-report version
