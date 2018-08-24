@@ -2,7 +2,7 @@ ARG GOVERSION=latest
 FROM golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
-apk add --no-cache make
+RUN apk add --no-cache make
 
 ARG GOVERSION
 ARG BUILD_DATE

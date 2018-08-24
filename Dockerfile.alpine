@@ -2,7 +2,7 @@ ARG GOVERSION=alpine3.8
 FROM golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
-apk add --no-cache make
+RUN apk add --no-cache make
 
 ADD musl.tar.gz ./musl
 RUN cd musl && \
