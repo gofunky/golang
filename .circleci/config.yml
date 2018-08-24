@@ -337,12 +337,12 @@ orbs:
 jobs:
   get-fossa:
     docker:
-    - image: debian:stable
+    - image: bash
     steps:
     - run:
         name: Install Fossa
         command: |
-          curl https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
+          wget -O - https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
     - persist_to_workspace:
         root: /usr/local/bin
         paths:
