@@ -12,7 +12,7 @@ RUN go get github.com/jstemmer/go-junit-report
 RUN go get github.com/haya14busa/goverage
 RUN go get github.com/schrej/godacov
 RUN go get github.com/fossas/fossa-cli
-RUN go build /go/src/github.com/fossas/fossa-cli/...
+RUN go build /go/src/github.com/fossas/fossa-cli/cmd/fossa
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/gofunky/golang" \

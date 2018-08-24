@@ -332,7 +332,7 @@ golang_docker: &golang_docker
   context: docker-hub
   # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
   useArgs: true
-  baseTag: golang
+  baseTag: gofunky/golang
   addLabels: true
   login:
   - run:
