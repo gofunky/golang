@@ -27,7 +27,7 @@ docker_build_params: &docker_build_params
   cache:
     description: "Use image layer cache"
     type: boolean
-    default: true
+    default: false
   path:
     description: "Build path"
     type: string
@@ -100,7 +100,7 @@ orbs:
             steps:
             - restore_cache:
                 keys:
-                - docker-<< parameters.path >>-<< parameters.file >>-{{ .Branch }}
+                - docker-<< parameters.path >>-<< parameters.file >>-<< parameters.baseTag >>-{{ .Branch }}
                 paths:
                 - /caches/<< parameters.baseTag >>.tar
             - run:
@@ -167,7 +167,7 @@ orbs:
                   mkdir -p /caches
                   docker save -o /caches/<< parameters.baseTag >>.tar << parameters.baseTag >>
             - save_cache:
-                key: docker-<< parameters.path >>-<< parameters.file >>-{{ .Branch }}-{{ epoch }}
+                key: docker-<< parameters.path >>-<< parameters.file >>-<< parameters.baseTag >>-{{ .Branch }}-{{ epoch }}
                 paths:
                 - /caches/<< parameters.baseTag >>.tar
       tag:
@@ -371,30 +371,25 @@ workflows:
         args: "GOVERSION=1.10.3"
         tags: "gofunky/golang:1.10.3-circleci"
         file: "Dockerfile.circleci"
-        cache: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7-circleci"
         file: "Dockerfile.circleci"
-        cache: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.10"
         tags: "gofunky/golang:1.10-circleci"
         file: "Dockerfile.circleci"
-        cache: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.9"
         tags: "gofunky/golang:1.9-circleci"
         file: "Dockerfile.circleci"
-        cache: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         tags: "gofunky/golang:circleci"
         file: "Dockerfile.circleci"
-        cache: false
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
     - dockerorb/build-test-push:
@@ -402,24 +397,29 @@ workflows:
         args: "GOVERSION=1.10.3-alpine3.8"
         tags: "gofunky/golang:1.10.3-alpine,gofunky/golang:1.10.3-alpine3.8"
         file: "Dockerfile.alpine"
+        cache: true
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.9.7-alpine3.8"
         tags: "gofunky/golang:1.9.7-alpine,gofunky/golang:1.9.7-alpine3.8"
         file: "Dockerfile.alpine"
+        cache: true
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.10-alpine3.8"
         tags: "gofunky/golang:1.10-alpine,gofunky/golang:1.10-alpine3.8"
         file: "Dockerfile.alpine"
+        cache: true
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.9-alpine3.8"
         tags: "gofunky/golang:1.9-alpine,gofunky/golang:1.9-alpine3.8"
         file: "Dockerfile.alpine"
+        cache: true
     - dockerorb/build-test-push:
         <<: *golang_docker
         tags: "gofunky/golang:alpine3.8,gofunky/golang:alpine"
         file: "Dockerfile.alpine"
+        cache: true
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
