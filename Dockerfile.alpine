@@ -1,3 +1,5 @@
+FROM quay.io/fossa/fossa-cli:v0.7.5 as fossa
+
 ARG GOVERSION=alpine3.8
 FROM golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
@@ -11,8 +13,7 @@ RUN go get github.com/golang/dep/cmd/dep
 RUN go get github.com/jstemmer/go-junit-report
 RUN go get github.com/haya14busa/goverage
 RUN go get github.com/schrej/godacov
-RUN go get github.com/fossas/fossa-cli
-RUN go build /go/src/github.com/fossas/fossa-cli/cmd/fossa
+COPY --from=build /home/fossa/go/bin/fossa /go/bin/fossa
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/gofunky/golang" \

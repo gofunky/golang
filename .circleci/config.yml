@@ -205,7 +205,7 @@ orbs:
         - run:
             name: Run Docker compose tests
             command: |
-              docker-compose -f "<< parameters.compose >>" up --exit-code-from sut
+              docker-compose --exit-code-from sut --build -f "<< parameters.compose >>" up
       push:
         parameters:
           <<: *docker_tags_params
