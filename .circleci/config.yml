@@ -102,11 +102,11 @@ orbs:
                 - docker-{{ .Branch }}
                 paths:
                 - /caches/<< parameters.baseTag >>.tar
-        - run:
-            name: Load Docker image layer cache
-            command: |
-              set +o pipefail
-              docker load -i /caches/<< parameters.baseTag >>.tar | true
+            - run:
+                name: Load Docker image layer cache
+                command: |
+                  set +o pipefail
+                  docker load -i /caches/<< parameters.baseTag >>.tar | true
         - when:
             condition: << parameters.useArgs >>
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
