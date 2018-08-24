@@ -11,10 +11,7 @@ RUN go get github.com/golang/dep/cmd/dep
 RUN go get github.com/jstemmer/go-junit-report
 RUN go get github.com/haya14busa/goverage
 RUN go get github.com/schrej/godacov
-
-ADD https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh /tmp/install.sh
-RUN sudo chmod +x /tmp/install.sh && \
-    sudo /tmp/install.sh
+RUN go get github.com/fossas/fossa-cli/cmd/fossa
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/gofunky/golang" \

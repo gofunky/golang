@@ -3,5 +3,5 @@ services:
   sut:
     image: golang
     volumes:
-    - ./:/sut
-    command: /sut/sut.sh
+    - .:/app:cached
+    command: /app/sut.sh

@@ -51,6 +51,7 @@ docker_build_args: &docker_build_args
   useArgs: << parameters.useArgs >>
   args: << parameters.args >>
   file: << parameters.file >>
+  cache: << parameters.cache >>
   path: << parameters.path >>
   baseTag: << parameters.baseTag >>
   attach: << parameters.attach >>
