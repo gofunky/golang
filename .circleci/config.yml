@@ -334,21 +334,34 @@ orbs:
                 tags: << parameters.tags >>
                 branch: << parameters.branch >>
 
+jobs:
+  get-fossa:
+    docker:
+    - image: ellerbrock/alpine-bash-curl-ssl
+    steps:
+    - run:
+        name: Install Fossa
+        command: |
+          curl https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
+    - persist_to_workspace:
+        root: /usr/local/bin
+        paths:
+        - fossa
+
 golang_docker: &golang_docker
   context: docker-hub
   # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
   useArgs: true
   baseTag: go
   addLabels: true
+  attach: true
+  requires:
+  - get-fossa
   prepare:
   - run:
       name: Fix permissions
       command: |
         chmod +x ./tests/sut.sh
-  - run:
-      name: Download Fossa Binary
-      command: |
-        curl https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
   login:
   - run:
       name: Login to Docker Hub
@@ -359,6 +372,7 @@ version: 2.1
 workflows:
   build:
     jobs:
+    - get-fossa
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.10.3"
