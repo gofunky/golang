@@ -337,7 +337,7 @@ orbs:
 jobs:
   get-fossa:
     docker:
-    - image: debian:stable-slim
+    - image: debian:stable
     steps:
     - run:
         name: Install Fossa
