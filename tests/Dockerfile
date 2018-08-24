@@ -1,4 +1,4 @@
-FROM gofunky/golang
+FROM go
 MAINTAINER matfax <mat@fax.fyi>
 
 WORKDIR /app
