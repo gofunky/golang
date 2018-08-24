@@ -2,4 +2,10 @@ version: '3.7'
 services:
   sut:
     image: golang
-    command: go version
+    command: |
+      go version
+      dep version
+      go-junit-report version
+      goverage version
+      godacov version
+      fossa version

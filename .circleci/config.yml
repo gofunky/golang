@@ -20,8 +20,12 @@ docker_attach_params: &docker_attach_params
     default: "."
 
 docker_build_params: &docker_build_params
-  path:
+  file:
     description: "Path to the Dockerfile"
+    type: string
+    default: "Dockerfile"
+  path:
+    description: "Build path"
     type: string
     default: "."
   addLabels:
@@ -42,6 +46,7 @@ docker_build_args: &docker_build_args
   # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
   useArgs: << parameters.useArgs >>
   args: << parameters.args >>
+  file: << parameters.file >>
   path: << parameters.path >>
   baseTag: << parameters.baseTag >>
   attach: << parameters.attach >>
@@ -111,7 +116,7 @@ orbs:
                       for arg in $args; do
                         buildarg="${buildarg} --build-arg ${arg}"
                       done
-                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>"
+                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>"
                       eval $build
             - unless:
                 condition: << parameters.addLabels >>
@@ -124,7 +129,7 @@ orbs:
                       for arg in $args; do
                         buildarg="${buildarg} --build-arg ${arg}"
                       done
-                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>"
+                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>"
                       eval $build
         - unless:
             condition: << parameters.useArgs >>
@@ -137,14 +142,14 @@ orbs:
                 - run:
                     name: Build Docker image without arguments and with labels
                     command: |
-                      docker build --build-arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build-arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>
+                      docker build --build-arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build-arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>
             - unless:
                 condition: << parameters.addLabels >>
                 steps:
                 - run:
                     name: Build Docker image without arguments and without labels
                     command: |
-                      docker build --cache-from=<< parameters.baseTag >> -t << parameters.baseTag >> << parameters.path >>
+                      docker build --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>
         - run:
             name: Save Docker image layer cache
             command: |
@@ -339,5 +344,37 @@ workflows:
     - dockerorb/build-test-push:
         <<: *golang_docker
         tags: "gofunky/golang:latest"
+        # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
+        useArgs: false
+    - dockerorb/build-test-push:
+        <<: *golang_docker
+        args: "GOVERSION=1.10.3"
+        tags: "gofunky/golang:1.10.3-circleci,gofunky/golang:1.10-circleci"
+        file: "Dockerfile.circleci"
+    - dockerorb/build-test-push:
+        <<: *golang_docker
+        args: "GOVERSION=1.9.7"
+        tags: "gofunky/golang:1.9.7-circleci,gofunky/golang:1.9-circleci"
+        file: "Dockerfile.circleci"
+    - dockerorb/build-test-push:
+        <<: *golang_docker
+        tags: "gofunky/golang:circleci"
+        file: "Dockerfile.circleci"
+        # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
+        useArgs: false
+    - dockerorb/build-test-push:
+        <<: *golang_docker
+        args: "GOVERSION=1.10.3-alpine3.8"
+        tags: "gofunky/golang:1.10.3-alpine,gofunky/golang:1.10-alpine,gofunky/golang:1.10.3-alpine3.8,gofunky/golang:1.10-alpine3.8"
+        file: "Dockerfile.alpine"
+    - dockerorb/build-test-push:
+        <<: *golang_docker
+        args: "GOVERSION=1.9.7-alpine3.8"
+        tags: "gofunky/golang:1.9.7-alpine,gofunky/golang:1.9-alpine,gofunky/golang:1.9.7-alpine3.8,gofunky/golang:1.9-alpine3.8"
+        file: "Dockerfile.alpine"
+    - dockerorb/build-test-push:
+        <<: *golang_docker
+        tags: "gofunky/golang:alpine3.8,gofunky/golang:alpine"
+        file: "Dockerfile.alpine"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
