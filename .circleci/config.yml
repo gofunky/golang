@@ -340,6 +340,10 @@ jobs:
     - image: bash
     steps:
     - run:
+        name: Install Certificates for Workspace
+        command: |
+          apk add --no-cache ca-certificates
+    - run:
         name: Install Fossa
         command: |
           wget -O - https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
