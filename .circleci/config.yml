@@ -28,6 +28,10 @@ docker_build_params: &docker_build_params
     description: "Use image layer cache"
     type: boolean
     default: false
+  prepare:
+    description: "Prepare steps after checkout (e.g., chmod)"
+    type: steps
+    default: []
   path:
     description: "Build path"
     type: string
@@ -52,6 +56,7 @@ docker_build_args: &docker_build_args
   args: << parameters.args >>
   file: << parameters.file >>
   cache: << parameters.cache >>
+  prepare: << parameters.prepare >>
   path: << parameters.path >>
   baseTag: << parameters.baseTag >>
   attach: << parameters.attach >>
@@ -95,6 +100,7 @@ orbs:
             steps:
             - attach_workspace:
                 at: << parameters.attachAt >>
+        - steps: << parameters.prepare >>
         - when:
             condition: << parameters.cache >>
             steps:
@@ -205,7 +211,6 @@ orbs:
         - run:
             name: Run Docker compose tests
             command: |
-              chmod +x ./tests/sut.sh
               docker-compose -f "<< parameters.compose >>" up --exit-code-from sut --build
       push:
         parameters:
@@ -335,6 +340,15 @@ golang_docker: &golang_docker
   useArgs: true
   baseTag: go
   addLabels: true
+  prepare:
+  - run:
+      name: Fix permissions
+      command: |
+        chmod +x ./tests/sut.sh
+  - run:
+      name: Download Fossa Binary
+      command: |
+        curl https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
   login:
   - run:
       name: Login to Docker Hub

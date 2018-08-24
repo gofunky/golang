@@ -9,10 +9,7 @@ ARG VCS_REF
 RUN go get github.com/jstemmer/go-junit-report
 RUN go get github.com/haya14busa/goverage
 RUN go get github.com/schrej/godacov
-
-ADD https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh /tmp/install.sh
-RUN sudo chmod +x /tmp/install.sh && \
-    sudo /tmp/install.sh
+COPY /usr/local/bin/fossa /usr/local/bin/fossa
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/gofunky/golang" \
