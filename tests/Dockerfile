@@ -1,9 +1,9 @@
 FROM go
 MAINTAINER matfax <mat@fax.fyi>
 
-WORKDIR /app
+WORKDIR /sut
 
-ADD . /app
+ADD . /sut
 RUN chmod +x sut.sh
 
 CMD ["./sut.sh"]
