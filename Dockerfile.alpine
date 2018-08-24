@@ -1,15 +1,17 @@
+FROM gcc:8.2.0 as musl
+
+ADD musl.tar.gz /musl
+WORKDIR /musl
+RUN cd * && \
+    ./configure && \
+    make && \
+    make install
+
 ARG GOVERSION=alpine3.8
 FROM golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
-RUN apk add --no-cache make
-
-ADD musl.tar.gz ./musl
-RUN cd musl && \
-    cd * && \
-    ./configure && \
-    make && \
-    make install
+COPY --from=musl /usr/local/musl /usr/local/musl
 
 ARG GOVERSION
 ARG BUILD_DATE
