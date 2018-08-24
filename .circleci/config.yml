@@ -351,6 +351,25 @@ jobs:
         root: /usr/local/bin
         paths:
         - fossa
+  get-musl:
+    docker:
+    - image: alpine
+    environment:
+      MUSLC_VERSION: 1.1.19
+    steps:
+    - run:
+        name: Install Certificates for Workspace
+        command: |
+          apk add --no-cache ca-certificates
+    - run:
+        name: Download Musl
+        command: |
+          wget http://www.musl-libc.org/releases/musl-${MUSLC_VERSION}.tar.gz
+          mv musl-${MUSLC_VERSION}.tar.gz musl.tar.gz
+    - persist_to_workspace:
+        root: .
+        paths:
+        - musl.tar.gz
 
 golang_docker: &golang_docker
   context: docker-hub
@@ -429,29 +448,39 @@ workflows:
         args: "GOVERSION=1.10.3-alpine3.8"
         tags: "gofunky/golang:1.10.3-alpine,gofunky/golang:1.10.3-alpine3.8"
         file: "Dockerfile.alpine"
+        requires:
+        - get-musl
         cache: true
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.9.7-alpine3.8"
         tags: "gofunky/golang:1.9.7-alpine,gofunky/golang:1.9.7-alpine3.8"
         file: "Dockerfile.alpine"
+        requires:
+        - get-musl
         cache: true
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.10-alpine3.8"
         tags: "gofunky/golang:1.10-alpine,gofunky/golang:1.10-alpine3.8"
         file: "Dockerfile.alpine"
+        requires:
+        - get-musl
         cache: true
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.9-alpine3.8"
         tags: "gofunky/golang:1.9-alpine,gofunky/golang:1.9-alpine3.8"
         file: "Dockerfile.alpine"
+        requires:
+        - get-musl
         cache: true
     - dockerorb/build-test-push:
         <<: *golang_docker
         tags: "gofunky/golang:alpine3.8,gofunky/golang:alpine"
         file: "Dockerfile.alpine"
+        requires:
+        - get-musl
         cache: true
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
