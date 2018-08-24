@@ -6,6 +6,7 @@ RUN apk add --no-cache make
 
 ADD musl.tar.gz ./musl
 RUN cd musl && \
+    cd * && \
     ./configure && \
     make && \
     make install
