@@ -396,6 +396,7 @@ workflows:
   build:
     jobs:
     - get-fossa
+    - get-musl
     - dockerorb/build-test-push:
         <<: *golang_docker
         args: "GOVERSION=1.10.3"
