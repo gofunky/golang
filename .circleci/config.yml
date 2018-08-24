@@ -337,7 +337,7 @@ orbs:
 jobs:
   get-fossa:
     docker:
-    - image: ellerbrock/alpine-bash-curl-ssl
+    - image: debian:stable-slim
     steps:
     - run:
         name: Install Fossa
