@@ -112,8 +112,8 @@ orbs:
         environment:
           README_PATH: /data/<< parameters.file >>
           IFS: "/"
-          DOCKERHUB_ORG: "<< parameters.organization >>"
-          DOCKERHUB_REPO: "<< parameters.repository >>"
+          DOCKERHUB_ORG: << parameters.organization >>
+          DOCKERHUB_REPO: << parameters.repository >>
     commands:
       update:
         parameters:
@@ -174,7 +174,7 @@ orbs:
           <<: *readmyhub_update_params
         steps:
         - update:
-            derive_repo << parameters.derive_repo >>
+            derive_repo: << parameters.derive_repo >>
 
   dockerorb:
     executors:
