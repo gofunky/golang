@@ -475,8 +475,16 @@ workflows:
         context: docker-hub
   build-master:
     jobs:
-    - get-fossa
-    - get-musl
+    - get-fossa:
+        filters:
+          branches:
+            only:
+            - master
+    - get-musl:
+        filters:
+          branches:
+            only:
+            - master
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
@@ -597,8 +605,10 @@ workflows:
         useArgs: false
   build-pull-request:
     jobs:
-    - get-fossa
-    - get-musl
+    - get-fossa:
+        <<: *golang_pr_filter
+    - get-musl:
+        <<: *golang_pr_filter
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
