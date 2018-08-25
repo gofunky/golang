@@ -85,6 +85,20 @@ readmyhub_version_params: &readmyhub_version_params
     description: "Path to the README.md file"
     type: string
     default: "README.md"
+  organization:
+    description: "Docker Hub organization or user name"
+    type: string
+    default: ""
+  repository:
+    description: "Docker Hub repository name"
+    type: string
+    default: ""
+
+readmyhub_update_params: &readmyhub_update_params
+  derive_repo:
+    description: "Enable to automatically derive the Docker Hub repository from the GitHub repository"
+    type: boolean
+    default: true
 
 orbs:
   readmyhuborb:
@@ -98,8 +112,12 @@ orbs:
         environment:
           README_PATH: /data/<< parameters.file >>
           IFS: "/"
+          DOCKERHUB_ORG: << parameters.organization >>
+          DOCKERHUB_REPO: << parameters.repository >>
     commands:
       update:
+        parameters:
+          <<: *readmyhub_update_params
         steps:
         - checkout
         - run:
@@ -116,18 +134,32 @@ orbs:
                 echo "ERROR: DOCKER_PWD is not set!"
                 exit 127
               fi
-        - run:
-            name: Update README
-            command: |
-              URL=`git remote get-url origin`
-              URL=`echo "$URL" | sed -e "s/^https:\/\///" -e "s/\.git//" | sed -e "s/^git@//"`
-              URL=`echo "$URL" | sed -r 's/github.com:/github.com\//g'`
-              read -a groups \<\<\< $URL
-              DOCKERHUB_ORG=${groups[1]}
-              DOCKERHUB_REPO=${groups[2]}
-              export DOCKERHUB_USR=${DOCKER_USR}
-              export DOCKERHUB_PWD=${DOCKER_PWD}
-              node /app/index.js
+        - when:
+            condition: << parameters.derive_repo >>
+            steps:
+            - run:
+                name: Update README
+                command: |
+                  set -f
+                  URL=`git remote get-url origin`
+                  URL=`echo "$URL" | sed -e "s/^https:\/\///" -e "s/\.git//" | sed -e "s/^git@//"`
+                  URL=`echo "$URL" | sed -r 's/github.com:/github.com\//g'`
+                  set -- $URL
+                  DOCKERHUB_ORG=$2
+                  DOCKERHUB_REPO=$3
+                  export DOCKERHUB_USR=${DOCKER_USR}
+                  export DOCKERHUB_PWD=${DOCKER_PWD}
+                  node /app/index.js
+                  set +f
+        - unless:
+            condition: << parameters.derive_repo >>
+            steps:
+            - run:
+                name: Update README
+                command: |
+                  export DOCKERHUB_USR=${DOCKER_USR}
+                  export DOCKERHUB_PWD=${DOCKER_PWD}
+                  node /app/index.js
     jobs:
       update:
         description: "Push the given README.md to the Docker Hub"
@@ -135,10 +167,14 @@ orbs:
           name: default
           version: << parameters.version >>
           file: << parameters.file >>
+          organization: << parameters.organization >>
+          repository: << parameters.repository >>
         parameters:
           <<: *readmyhub_version_params
+          <<: *readmyhub_update_params
         steps:
-        - update
+        - update:
+            derive_repo << parameters.derive_repo >>
 
   dockerorb:
     executors:
