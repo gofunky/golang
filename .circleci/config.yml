@@ -80,7 +80,7 @@ readmyhub_version_params: &readmyhub_version_params
   version:
     description: "Version of the readmyhub Docker image"
     type: string
-    default: latest
+    default: stable
   file:
     description: "Path to the README.md file"
     type: string
@@ -93,7 +93,7 @@ orbs:
         parameters:
           <<: *readmyhub_version_params
         docker:
-        - image: gofunky/readmyhub:<< parameters.version >>
+        - image: gofunky/readmyhub:<< parameters.version >>-git
         working_directory: /data
         environment:
           README_PATH: /data/<< parameters.file >>
