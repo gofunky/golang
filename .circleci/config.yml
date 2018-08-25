@@ -471,7 +471,7 @@ workflows:
             only:
             - master
         name: readme
-        version: 1.0.1
+        version: 1.1.0
         context: docker-hub
   build-master:
     jobs:
