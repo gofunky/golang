@@ -122,7 +122,7 @@ orbs:
               URL=`git remote get-url origin`
               URL=`echo "$URL" | sed -e "s/^https:\/\///" -e "s/\.git//" | sed -e "s/^git@//"`
               URL=`echo "$URL" | sed -r 's/github.com:/github.com\//g'`
-              read -a groups <<< $URL
+              read -a groups \<\<\< $URL
               DOCKERHUB_ORG=${groups[1]}
               DOCKERHUB_REPO=${groups[2]}
               export DOCKERHUB_USR=${DOCKER_USR}
