@@ -76,7 +76,70 @@ docker_version_params: &docker_version_params
     type: string
     default: stable
 
+readmyhub_version_params: &readmyhub_version_params
+  version:
+    description: "Version of the readmyhub Docker image"
+    type: string
+    default: latest
+  file:
+    description: "Path to the README.md file"
+    type: string
+    default: "README.md"
+
 orbs:
+  readmyhuborb:
+    executors:
+      default:
+        parameters:
+          <<: *readmyhub_version_params
+        docker:
+        - image: gofunky/readmyhub:<< parameters.version >>
+        working_directory: /data
+        environment:
+          README_PATH: /data/<< parameters.file >>
+          IFS: "/"
+    commands:
+      update:
+        steps:
+        - checkout
+        - run:
+            name: Check DOCKER_USR
+            command: |
+              if [ -z "$DOCKER_USR" ]; then
+                echo "ERROR: DOCKER_USR is not set!"
+                exit 127
+              fi
+        - run:
+            name: Check DOCKER_PWD
+            command: |
+              if [ -z "$DOCKER_PWD" ]; then
+                echo "ERROR: DOCKER_PWD is not set!"
+                exit 127
+              fi
+        - run:
+            name: Update README
+            command: |
+              URL=`git remote get-url origin`
+              URL=`echo "$URL" | sed -e "s/^https:\/\///" -e "s/\.git//" | sed -e "s/^git@//"`
+              URL=`echo "$URL" | sed -r 's/github.com:/github.com\//g'`
+              read -a groups <<< $URL
+              DOCKERHUB_ORG=${groups[1]}
+              DOCKERHUB_REPO=${groups[2]}
+              export DOCKERHUB_USR=${DOCKER_USR}
+              export DOCKERHUB_PWD=${DOCKER_PWD}
+              node /app/index.js
+    jobs:
+      update:
+        description: "Push the given README.md to the Docker Hub"
+        executor:
+          name: default
+          version: << parameters.version >>
+          file: << parameters.file >>
+        parameters:
+          <<: *readmyhub_version_params
+        steps:
+        - update
+
   dockerorb:
     executors:
       default:
@@ -404,6 +467,10 @@ workflows:
     jobs:
     - get-fossa
     - get-musl
+    - readmyhuborb/update:
+        version: 1.0.1
+        context: docker-hub
+
     # For master branch
     - dockerorb/build-test-push:
         <<: *golang_docker
