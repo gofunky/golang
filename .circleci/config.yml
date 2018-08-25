@@ -63,18 +63,20 @@ docker_build_args: &docker_build_args
   attachAt: << parameters.attachAt >>
   addLabels: << parameters.addLabels >>
 
+docker_version_params: &docker_version_params
+  docker_version:
+    description: "Docker version"
+    type: string
+    default: stable
+
 orbs:
   dockerorb:
     executors:
       default:
+        parameters:
+          <<: *docker_version_params
         docker:
-        - image: docker:18.06.0-git
-        working_directory: ~/app
-        environment:
-          IFS: ","
-      compose:
-        docker:
-        - image: gofunky/compose:1.21.2
+        - image: docker:<< parameters.docker_version >>-git
         working_directory: ~/app
         environment:
           IFS: ","
@@ -231,23 +233,29 @@ orbs:
     jobs:
       build:
         description: "Build Docker image"
-        executor: default
+        executor:
+          name: default
+          docker_version: << parameters.docker_version >>
         parameters:
           <<: *docker_arg_params
           <<: *docker_attach_params
           <<: *docker_build_params
+          <<: *docker_version_params
         steps:
         - build:
             <<: *docker_build_args
 
       build-test:
         description: "Build Docker image"
-        executor: default
+        executor:
+          name: default
+          docker_version: << parameters.docker_version >>
         parameters:
           <<: *docker_arg_params
           <<: *docker_attach_params
           <<: *docker_build_params
           <<: *docker_tags_params
+          <<: *docker_version_params
           compose:
             description: "Path to the docker compose test file to test"
             type: string
@@ -260,16 +268,20 @@ orbs:
             baseTag: << parameters.baseTag >>
         - test:
             compose: << parameters.compose >>
+            composeversion:
 
 
       build-push:
         description: "Build and push Docker image"
-        executor: default
+        executor:
+          name: default
+          docker_version: << parameters.docker_version >>
         parameters:
           <<: *docker_arg_params
           <<: *docker_attach_params
           <<: *docker_build_params
           <<: *docker_tags_params
+          <<: *docker_version_params
           login:
             description: "Login to your repository"
             type: steps
@@ -297,12 +309,15 @@ orbs:
 
       build-test-push:
         description: "Build and push Docker image"
-        executor: default
+        executor:
+          name: default
+          docker_version: << parameters.docker_version >>
         parameters:
           <<: *docker_arg_params
           <<: *docker_attach_params
           <<: *docker_build_params
           <<: *docker_tags_params
+          <<: *docker_version_params
           login:
             description: "Login to your repository"
             type: steps
@@ -378,6 +393,7 @@ golang_docker: &golang_docker
   baseTag: go
   addLabels: true
   attach: true
+  docker_version: 18.06.1
   requires:
   - get-fossa
   prepare:
