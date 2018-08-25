@@ -466,10 +466,10 @@ workflows:
   readme:
     jobs:
     - readmyhuborb/update:
-      <<: *golang_master_filter
-      name: readme
-      version: 1.0.1
-      context: docker-hub
+        <<: *golang_master_filter
+        name: readme
+        version: 1.0.1
+        context: docker-hub
   build-master:
     jobs:
     - get-fossa
