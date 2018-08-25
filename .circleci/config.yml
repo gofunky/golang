@@ -466,7 +466,10 @@ workflows:
   readme:
     jobs:
     - readmyhuborb/update:
-        <<: *golang_master_filter
+        filters:
+          branches:
+            only:
+            - master
         name: readme
         version: 1.0.1
         context: docker-hub
