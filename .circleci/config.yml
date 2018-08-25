@@ -463,68 +463,80 @@ golang_pr_filter: &golang_pr_filter
 
 version: 2.1
 workflows:
-  build:
+  readme:
+    jobs:
+    - readmyhuborb/update:
+      <<: *golang_master_filter
+      name: readme
+      version: 1.0.1
+      context: docker-hub
+  build-master:
     jobs:
     - get-fossa
     - get-musl
-    - readmyhuborb/update:
-        version: 1.0.1
-        context: docker-hub
-
-    # For master branch
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: build-1.10.3
         args: "GOVERSION=1.10.3"
         tags: "gofunky/golang:1.10.3"
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: build-1.9.7
         args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7"
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: build-1.10
         args: "GOVERSION=1.10"
         tags: "gofunky/golang:1.10"
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: build-1.9
         args: "GOVERSION=1.9"
         tags: "gofunky/golang:1.9"
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: build-latest
         tags: "gofunky/golang:latest"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: circleci-1.10.3
         args: "GOVERSION=1.10.3"
         tags: "gofunky/golang:1.10.3-circleci"
         file: "Dockerfile.circleci"
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: circleci-1.9.7
         args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7-circleci"
         file: "Dockerfile.circleci"
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: circleci-1.10
         args: "GOVERSION=1.10"
         tags: "gofunky/golang:1.10-circleci"
         file: "Dockerfile.circleci"
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: circleci-1.9
         args: "GOVERSION=1.9"
         tags: "gofunky/golang:1.9-circleci"
         file: "Dockerfile.circleci"
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: circleci-latest
         tags: "gofunky/golang:circleci"
         file: "Dockerfile.circleci"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
@@ -532,6 +544,7 @@ workflows:
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: alpine-1.10.3
         args: "GOVERSION=1.10.3-alpine3.8"
         tags: "gofunky/golang:1.10.3-alpine,gofunky/golang:1.10.3-alpine3.8"
         file: "Dockerfile.alpine"
@@ -541,6 +554,7 @@ workflows:
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: alpine-1.9.7
         args: "GOVERSION=1.9.7-alpine3.8"
         tags: "gofunky/golang:1.9.7-alpine,gofunky/golang:1.9.7-alpine3.8"
         file: "Dockerfile.alpine"
@@ -550,6 +564,7 @@ workflows:
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: alpine-1.10
         args: "GOVERSION=1.10-alpine3.8"
         tags: "gofunky/golang:1.10-alpine,gofunky/golang:1.10-alpine3.8"
         file: "Dockerfile.alpine"
@@ -559,6 +574,7 @@ workflows:
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: alpine-1.9
         args: "GOVERSION=1.9-alpine3.8"
         tags: "gofunky/golang:1.9-alpine,gofunky/golang:1.9-alpine3.8"
         file: "Dockerfile.alpine"
@@ -568,6 +584,7 @@ workflows:
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
+        name: alpine-latest
         tags: "gofunky/golang:alpine3.8,gofunky/golang:alpine"
         file: "Dockerfile.alpine"
         requires:
@@ -575,92 +592,105 @@ workflows:
         cache: true
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
-    # For pull requests
+  build-pull-request:
+    jobs:
+    - get-fossa
+    - get-musl
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: build-1.10.3
         args: "GOVERSION=1.10.3"
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: build-1.9.7
         args: "GOVERSION=1.9.7"
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: build-1.10
         args: "GOVERSION=1.10"
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: build-1.9
         args: "GOVERSION=1.9"
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: build-latest
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: circleci-1.10.3
         args: "GOVERSION=1.10.3"
         file: "Dockerfile.circleci"
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: circleci-1.9.7
         args: "GOVERSION=1.9.7"
         file: "Dockerfile.circleci"
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: circleci-1.10
         args: "GOVERSION=1.10"
         file: "Dockerfile.circleci"
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: circleci-1.9
         args: "GOVERSION=1.9"
         file: "Dockerfile.circleci"
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: circleci-latest
         file: "Dockerfile.circleci"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: alpine-1.10.3
         args: "GOVERSION=1.10.3-alpine3.8"
         file: "Dockerfile.alpine"
         requires:
         - get-musl
-        cache: true
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: alpine-1.9.7
         args: "GOVERSION=1.9.7-alpine3.8"
         file: "Dockerfile.alpine"
         requires:
         - get-musl
-        cache: true
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: alpine-1.10
         args: "GOVERSION=1.10-alpine3.8"
         file: "Dockerfile.alpine"
         requires:
         - get-musl
-        cache: true
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: alpine-1.9
         args: "GOVERSION=1.9-alpine3.8"
         file: "Dockerfile.alpine"
         requires:
         - get-musl
-        cache: true
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: alpine-latest
         file: "Dockerfile.alpine"
         requires:
         - get-musl
-        cache: true
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         useArgs: false
