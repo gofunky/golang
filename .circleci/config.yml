@@ -94,8 +94,7 @@ orbs:
         steps:
         - run:
             name: "Login to your origin Docker repository"
-            command: |
-              << parameters.login >>
+            command: << parameters.login >>
       build:
         parameters:
           <<: *docker_arg_params
@@ -387,9 +386,9 @@ golang_docker: &golang_docker
       name: Fix permissions
       command: |
         chmod +x ./tests/sut.sh
-  login: docker login -u $DOCKER_USR -p $DOCKER_PWD
 
 golang_master_filter: &golang_master_filter
+  login: docker login -u $DOCKER_USR -p $DOCKER_PWD
   filters:
     branches:
       only:
