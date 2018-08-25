@@ -8,7 +8,7 @@ docker_login_params: &docker_login_params
   login:
     description: "Login command to your repository (using environment variables from your secure context)"
     type: string
-    default: ""
+    default: echo "Login SKIPPED"
 
 docker_arg_params: &docker_arg_params
   # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
