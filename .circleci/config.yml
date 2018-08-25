@@ -112,8 +112,8 @@ orbs:
         environment:
           README_PATH: /data/<< parameters.file >>
           IFS: "/"
-          DOCKERHUB_ORG: << parameters.organization >>
-          DOCKERHUB_REPO: << parameters.repository >>
+          DOCKERHUB_ORG: "<< parameters.organization >>"
+          DOCKERHUB_REPO: "<< parameters.repository >>"
     commands:
       update:
         parameters:
