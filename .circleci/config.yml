@@ -399,7 +399,7 @@ golang_pr_filter: &golang_pr_filter
   filters:
     branches:
       only:
-      - only: /^pull.*/
+      - /^pull.*/
 
 version: 2.1
 workflows:
