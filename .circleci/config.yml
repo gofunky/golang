@@ -449,14 +449,17 @@ jobs:
         paths:
         - fossa
   get-musl:
+    parameters:
+      musl_version:
+        description: "Musl version"
+        type: string
+        default: 1.1.19
     docker:
     - image: gcc:8.2.0
-    environment:
-      MUSLC_VERSION: 1.1.19
     steps:
     - restore_cache:
         keys:
-        - musl-{{ .Branch }}-{{ .Environment.MUSLC_VERSION }}
+        - musl-{{ .Branch }}-<< parameters.musl_version >>
     - run:
         name: Download musl
         command: |
@@ -464,8 +467,8 @@ jobs:
             echo "SKIPPING..."
             exit 0
           fi
-          wget http://www.musl-libc.org/releases/musl-${MUSLC_VERSION}.tar.gz
-          mv musl-${MUSLC_VERSION}.tar.gz musl.tar.gz
+          wget http://www.musl-libc.org/releases/musl-<< parameters.musl_version >>.tar.gz
+          mv musl-<< parameters.musl_version >>.tar.gz musl.tar.gz
     - run:
         name: Unpack musl
         command: |
@@ -488,7 +491,7 @@ jobs:
           make
           make install
     - save_cache:
-        key: musl-{{ .Branch }}-{{ .Environment.MUSLC_VERSION }}
+        key: musl-{{ .Branch }}-<< parameters.musl_version >>
         paths:
         - ./musl
     - persist_to_workspace:
@@ -517,7 +520,7 @@ jobs:
           tar -Jxvf upx-${UPX_VERSION}-amd64_linux.tar.xz -C ./upx-src
           cd ./upx-src
           cd *
-          cp cp ./upx* ./../../upx
+          cp ./upx* ./../../upx
     - persist_to_workspace:
         root: .
         paths:
