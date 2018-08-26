@@ -453,7 +453,7 @@ jobs:
       musl_version:
         description: "Musl version"
         type: string
-        default: 1.1.19
+        default: "1.1.19"
     docker:
     - image: gcc:8.2.0
     steps:
@@ -503,7 +503,7 @@ jobs:
       upx_version:
         description: "UPX version"
         type: string
-        default: 3.95
+        default: "3.95"
     docker:
     - image: alpine
     steps:
