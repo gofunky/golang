@@ -459,7 +459,7 @@ jobs:
     steps:
     - restore_cache:
         keys:
-        - musl-{{ .Branch }}-<< parameters.musl_version >>
+        - musl-<< parameters.musl_version >>
     - run:
         name: Download musl
         command: |
@@ -491,7 +491,7 @@ jobs:
           make
           make install
     - save_cache:
-        key: musl-{{ .Branch }}-<< parameters.musl_version >>
+        key: musl-<< parameters.musl_version >>
         paths:
         - /usr/local/musl
     - persist_to_workspace:
@@ -507,17 +507,13 @@ jobs:
     docker:
     - image: alpine
     steps:
-    - restore_cache:
-        keys:
-        - upx-{{ .Branch }}-<< parameters.upx_version >>
     - run:
         name: Install Certificates for Workspace
         command: |
-          if [ -e "./upx" ]; then
-            echo "SKIPPING..."
-            exit 0
-          fi
           apk add --no-cache ca-certificates
+    - restore_cache:
+        keys:
+        - upx-<< parameters.upx_version >>
     - run:
         name: Download UPX
         command: |
@@ -540,7 +536,7 @@ jobs:
           cd *
           cp ./upx* ./../../upx
     - save_cache:
-        key: upx-{{ .Branch }}-<< parameters.upx_version >>
+        key: upx-<< parameters.upx_version >>
         paths:
         - ./upx/
     - persist_to_workspace:
