@@ -504,7 +504,7 @@ jobs:
     - run:
         name: Install Certificates for Workspace
         command: |
-          apk add --no-cache ca-certificates tar xz-utils
+          apk add --no-cache ca-certificates
     - run:
         name: Download UPX
         command: |
@@ -514,7 +514,7 @@ jobs:
         command: |
           mkdir -pv ./upx
           mkdir -pv ./upx-src
-          tar -xzvf upx-${UPX_VERSION}-amd64_linux.tar.xz -C ./upx-src
+          tar -Jxvf upx-${UPX_VERSION}-amd64_linux.tar.xz -C ./upx-src
           cd ./upx-src
           cd *
           cp cp ./upx* ./../../upx
