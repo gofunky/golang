@@ -450,23 +450,59 @@ jobs:
         - fossa
   get-musl:
     docker:
-    - image: alpine
+    - image: gcc:8.2.0
     environment:
       MUSLC_VERSION: 1.1.19
     steps:
+    - restore_cache:
+        keys:
+        - musl-{{ .Branch }}-{{ .Environment.MUSLC_VERSION }}
     - run:
         name: Install Certificates for Workspace
         command: |
+          if [ -e "./musl" ]; then
+            echo "SKIPPING..."
+            exit 0
+          fi
           apk add --no-cache ca-certificates
     - run:
-        name: Download Musl
+        name: Download musl
         command: |
+          if [ -e "./musl" ]; then
+            echo "SKIPPING..."
+            exit 0
+          fi
           wget http://www.musl-libc.org/releases/musl-${MUSLC_VERSION}.tar.gz
           mv musl-${MUSLC_VERSION}.tar.gz musl.tar.gz
-    - persist_to_workspace:
-        root: .
+    - run:
+        name: Unpack musl
+        command: |
+          if [ -e "./musl" ]; then
+            echo "SKIPPING..."
+            exit 0
+          fi
+          mkdir -pv ./musl-src
+          tar -xzvf musl.tar.gz -C ./musl-src
+    - run:
+        name: Make musl
+        command: |
+          if [ -e "./musl" ]; then
+            echo "SKIPPING..."
+            exit 0
+          fi
+          cd ./musl-src
+          cd *
+          ./configure
+          make
+          make install
+    - save_cache:
+        key: musl-{{ .Branch }}-{{ .Environment.MUSLC_VERSION }}
         paths:
-        - musl.tar.gz
+        - ./musl
+    - persist_to_workspace:
+        root: /usr/local
+        paths:
+        - musl
   get-upx:
     docker:
     - image: alpine
@@ -476,7 +512,7 @@ jobs:
     - run:
         name: Install Certificates for Workspace
         command: |
-          apk add --no-cache ca-certificates
+          apk add --no-cache ca-certificates tar
     - run:
         name: Download UPX
         command: |
@@ -494,29 +530,6 @@ jobs:
         root: .
         paths:
         - upx
-  make-musl:
-    docker:
-    - image: gcc:8.2.0
-    steps:
-    - attach_workspace:
-        at: .
-    - run:
-        name: Unpack archive
-        command: |
-          mkdir -pv ./musl-src
-          tar -xzvf musl.tar.gz -C ./musl-src
-    - run:
-        name: Make musl
-        command: |
-          cd ./musl-src
-          cd *
-          ./configure
-          make
-          make install
-    - persist_to_workspace:
-        root: /usr/local
-        paths:
-        - musl
 
 golang_docker: &golang_docker
   context: docker-hub
@@ -529,7 +542,7 @@ golang_docker: &golang_docker
   requires:
   - get-fossa
   - get-upx
-  - make-musl
+  - get-musl
   prepare:
   - run:
       name: Fix permissions
@@ -568,10 +581,6 @@ workflows:
         <<: *golang_master_filter
     - get-musl:
         <<: *golang_master_filter
-    - make-musl:
-        <<: *golang_master_filter
-        requires:
-        - get-musl
     - dockerorb/build-test-push:
         <<: *golang_docker
         <<: *golang_master_filter
@@ -703,10 +712,6 @@ workflows:
         <<: *golang_pr_filter
     - get-musl:
         <<: *golang_pr_filter
-    - make-musl:
-        <<: *golang_pr_filter
-        requires:
-        - get-musl
     - dockerorb/build-test:
         <<: *golang_docker
         <<: *golang_pr_filter
