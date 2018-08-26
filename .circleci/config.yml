@@ -499,28 +499,50 @@ jobs:
         paths:
         - musl
   get-upx:
+    parameters:
+      upx_version:
+        description: "UPX version"
+        type: string
+        default: 3.95
     docker:
     - image: alpine
-    environment:
-      UPX_VERSION: 3.95
     steps:
+    - restore_cache:
+        keys:
+        - upx-{{ .Branch }}-<< parameters.upx_version >>
     - run:
         name: Install Certificates for Workspace
         command: |
+          if [ -e "./upx" ]; then
+            echo "SKIPPING..."
+            exit 0
+          fi
           apk add --no-cache ca-certificates
     - run:
         name: Download UPX
         command: |
-          wget https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz
+          if [ -e "./upx" ]; then
+            echo "SKIPPING..."
+            exit 0
+          fi
+          wget https://github.com/upx/upx/releases/download/v<< parameters.upx_version >>/upx-<< parameters.upx_version >>-amd64_linux.tar.xz
     - run:
         name: Unpack UPX
         command: |
+          if [ -e "./upx" ]; then
+            echo "SKIPPING..."
+            exit 0
+          fi
           mkdir -pv ./upx
           mkdir -pv ./upx-src
-          tar -Jxvf upx-${UPX_VERSION}-amd64_linux.tar.xz -C ./upx-src
+          tar -Jxvf upx-<< parameters.upx_version >>-amd64_linux.tar.xz -C ./upx-src
           cd ./upx-src
           cd *
           cp ./upx* ./../../upx
+    - save_cache:
+        key: upx-{{ .Branch }}-<< parameters.upx_version >>
+        paths:
+        - ./upx
     - persist_to_workspace:
         root: .
         paths:

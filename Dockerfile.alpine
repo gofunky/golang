@@ -1,3 +1,4 @@
+ARG GOVERSION=alpine3.8
 FROM golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
