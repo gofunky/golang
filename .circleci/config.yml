@@ -59,16 +59,16 @@ docker_tags_params: &docker_tags_params
 
 docker_build_args: &docker_build_args
   # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-  useArgs: << parameters.useArgs >>
-  args: << parameters.args >>
-  file: << parameters.file >>
-  cache: << parameters.cache >>
-  prepare: << parameters.prepare >>
-  path: << parameters.path >>
-  baseTag: << parameters.baseTag >>
-  attach: << parameters.attach >>
-  attachAt: << parameters.attachAt >>
-  addLabels: << parameters.addLabels >>
+  useArgs: << useArgs >>
+  args: << args >>
+  file: << file >>
+  cache: << cache >>
+  prepare: << prepare >>
+  path: << path >>
+  baseTag: << baseTag >>
+  attach: << attach >>
+  attachAt: << attachAt >>
+  addLabels: << addLabels >>
 
 docker_version_params: &docker_version_params
   docker_version:
@@ -107,13 +107,13 @@ orbs:
         parameters:
           <<: *readmyhub_version_params
         docker:
-        - image: gofunky/readmyhub:<< parameters.version >>-git
+        - image: gofunky/readmyhub:<< version >>-git
         working_directory: /data
         environment:
-          README_PATH: /data/<< parameters.file >>
+          README_PATH: /data/<< file >>
           IFS: "/"
-          DOCKERHUB_ORG: << parameters.organization >>
-          DOCKERHUB_REPO: << parameters.repository >>
+          DOCKERHUB_ORG: << organization >>
+          DOCKERHUB_REPO: << repository >>
     commands:
       update:
         parameters:
@@ -135,7 +135,7 @@ orbs:
                 exit 127
               fi
         - when:
-            condition: << parameters.derive_repo >>
+            condition: << derive_repo >>
             steps:
             - run:
                 name: Update README
@@ -152,7 +152,7 @@ orbs:
                   node /app/index.js
                   set +f
         - unless:
-            condition: << parameters.derive_repo >>
+            condition: << derive_repo >>
             steps:
             - run:
                 name: Update README
@@ -165,16 +165,16 @@ orbs:
         description: "Push the given README.md to the Docker Hub"
         executor:
           name: default
-          version: << parameters.version >>
-          file: << parameters.file >>
-          organization: << parameters.organization >>
-          repository: << parameters.repository >>
+          version: << version >>
+          file: << file >>
+          organization: << organization >>
+          repository: << repository >>
         parameters:
           <<: *readmyhub_version_params
           <<: *readmyhub_update_params
         steps:
         - update:
-            derive_repo: << parameters.derive_repo >>
+            derive_repo: << derive_repo >>
 
   dockerorb:
     executors:
@@ -182,7 +182,7 @@ orbs:
         parameters:
           <<: *docker_version_params
         docker:
-        - image: docker:<< parameters.docker_version >>-git
+        - image: docker:<< docker_version >>-git
         working_directory: ~/app
         environment:
           IFS: ","
@@ -193,7 +193,7 @@ orbs:
         steps:
         - run:
             name: "Login to your origin Docker repository"
-            command: << parameters.login >>
+            command: << login >>
       build:
         parameters:
           <<: *docker_arg_params
@@ -203,86 +203,86 @@ orbs:
         - checkout
         - setup_remote_docker
         - when:
-            condition: << parameters.attach >>
+            condition: << attach >>
             steps:
             - attach_workspace:
-                at: << parameters.attachAt >>
-        - steps: << parameters.prepare >>
+                at: << attachAt >>
+        - steps: << prepare >>
         - when:
-            condition: << parameters.cache >>
+            condition: << cache >>
             steps:
             - restore_cache:
                 keys:
-                - docker-<< parameters.path >>-<< parameters.file >>-<< parameters.baseTag >>-{{ .Branch }}
+                - docker-<< path >>-<< file >>-<< baseTag >>-{{ .Branch }}
                 paths:
-                - /caches/<< parameters.baseTag >>.tar
+                - /caches/<< baseTag >>.tar
             - run:
                 name: Load Docker image layer cache
                 command: |
                   set +o pipefail
-                  docker load -i /caches/<< parameters.baseTag >>.tar | true
+                  docker load -i /caches/<< baseTag >>.tar | true
         - when:
-            condition: << parameters.useArgs >>
+            condition: << useArgs >>
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
-            # matches: ['([a-zA-Z][\w]*=[\w-\/.:]+)(,[a-zA-Z][\w]*=[\w-\/.:]+)*', "<< parameters.args >>"]
+            # matches: ['([a-zA-Z][\w]*=[\w-\/.:]+)(,[a-zA-Z][\w]*=[\w-\/.:]+)*', "<< args >>"]
             steps:
             - when:
-                condition: << parameters.addLabels >>
+                condition: << addLabels >>
                 steps:
                 - run:
                     name: Build Docker image with arguments and labels
                     command: |
                       buildarg=""
-                      args="<< parameters.args >>,BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"`,VCS_REF=`git rev-parse --short HEAD`"
+                      args="<< args >>,BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"`,VCS_REF=`git rev-parse --short HEAD`"
                       for arg in $args; do
                         buildarg="${buildarg} --build-arg ${arg}"
                       done
-                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>"
+                      build="docker build ${buildarg} --cache-from=<< baseTag >> -f << file >> -t << baseTag >> << path >>"
                       eval $build
             - unless:
-                condition: << parameters.addLabels >>
+                condition: << addLabels >>
                 steps:
                 - run:
                     name: Build Docker image with arguments and without labels
                     command: |
                       buildarg=""
-                      args="<< parameters.args >>"
+                      args="<< args >>"
                       for arg in $args; do
                         buildarg="${buildarg} --build-arg ${arg}"
                       done
-                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>"
+                      build="docker build ${buildarg} --cache-from=<< baseTag >> -f << file >> -t << baseTag >> << path >>"
                       eval $build
         - unless:
-            condition: << parameters.useArgs >>
+            condition: << useArgs >>
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
-            # matches: ['([a-zA-Z][\w]*=[\w-\/.:]+)(,[a-zA-Z][\w]*=[\w-\/.:]+)*', "<< parameters.args >>"]
+            # matches: ['([a-zA-Z][\w]*=[\w-\/.:]+)(,[a-zA-Z][\w]*=[\w-\/.:]+)*', "<< args >>"]
             steps:
             - when:
-                condition: << parameters.addLabels >>
+                condition: << addLabels >>
                 steps:
                 - run:
                     name: Build Docker image without arguments and with labels
                     command: |
-                      docker build --build-arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build-arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>
+                      docker build --build-arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build-arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< baseTag >> -f << file >> -t << baseTag >> << path >>
             - unless:
-                condition: << parameters.addLabels >>
+                condition: << addLabels >>
                 steps:
                 - run:
                     name: Build Docker image without arguments and without labels
                     command: |
-                      docker build --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>
+                      docker build --cache-from=<< baseTag >> -f << file >> -t << baseTag >> << path >>
         - when:
-            condition: << parameters.cache >>
+            condition: << cache >>
             steps:
             - run:
                 name: Save Docker image layer cache
                 command: |
                   mkdir -p /caches
-                  docker save -o /caches/<< parameters.baseTag >>.tar << parameters.baseTag >>
+                  docker save -o /caches/<< baseTag >>.tar << baseTag >>
             - save_cache:
-                key: docker-<< parameters.path >>-<< parameters.file >>-<< parameters.baseTag >>-{{ .Branch }}-{{ epoch }}
+                key: docker-<< path >>-<< file >>-<< baseTag >>-{{ .Branch }}-{{ epoch }}
                 paths:
-                - /caches/<< parameters.baseTag >>.tar
+                - /caches/<< baseTag >>.tar
       tag:
         parameters:
           <<: *docker_tags_params
@@ -294,9 +294,9 @@ orbs:
         - run:
             name: Add Docker tags
             command: |
-              tags="<< parameters.tags >>"
+              tags="<< tags >>"
               for tag in $tags; do
-                docker tag << parameters.baseTag >> "$tag"
+                docker tag << baseTag >> "$tag"
               done
       test:
         parameters:
@@ -318,7 +318,7 @@ orbs:
         - run:
             name: Run Docker compose tests
             command: |
-              docker-compose -f "<< parameters.compose >>" up --exit-code-from sut --build --abort-on-container-exit
+              docker-compose -f "<< compose >>" up --exit-code-from sut --build --abort-on-container-exit
       push:
         parameters:
           <<: *docker_tags_params
@@ -326,7 +326,7 @@ orbs:
         - deploy:
             name: Push application Docker image
             command: |
-              tags="<< parameters.tags >>"
+              tags="<< tags >>"
               for tag in $tags; do
                 docker push "$tag"
               done
@@ -335,7 +335,7 @@ orbs:
         description: "Build Docker image"
         executor:
           name: default
-          docker_version: << parameters.docker_version >>
+          docker_version: << docker_version >>
         parameters:
           <<: *docker_arg_params
           <<: *docker_attach_params
@@ -349,7 +349,7 @@ orbs:
         description: "Build Docker image"
         executor:
           name: default
-          docker_version: << parameters.docker_version >>
+          docker_version: << docker_version >>
         parameters:
           <<: *docker_arg_params
           <<: *docker_attach_params
@@ -364,16 +364,16 @@ orbs:
         - build:
             <<: *docker_build_args
         - tag:
-            tags: << parameters.tags >>
-            baseTag: << parameters.baseTag >>
+            tags: << tags >>
+            baseTag: << baseTag >>
         - test:
-            compose: << parameters.compose >>
+            compose: << compose >>
 
       build-push:
         description: "Build and push Docker image"
         executor:
           name: default
-          docker_version: << parameters.docker_version >>
+          docker_version: << docker_version >>
         parameters:
           <<: *docker_arg_params
           <<: *docker_attach_params
@@ -387,21 +387,21 @@ orbs:
         - when:
             condition: true
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
-            # matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
+            # matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< tags >>"]
             steps:
             - tag:
-                tags: << parameters.tags >>
-                baseTag: << parameters.baseTag >>
+                tags: << tags >>
+                baseTag: << baseTag >>
             - login:
-                login: << parameters.login >>
+                login: << login >>
             - push:
-                tags: << parameters.tags >>
+                tags: << tags >>
 
       build-test-push:
         description: "Build and push Docker image"
         executor:
           name: default
-          docker_version: << parameters.docker_version >>
+          docker_version: << docker_version >>
         parameters:
           <<: *docker_arg_params
           <<: *docker_attach_params
@@ -419,17 +419,17 @@ orbs:
         - when:
             condition: true
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
-            # matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
+            # matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< tags >>"]
             steps:
             - tag:
-                tags: << parameters.tags >>
-                baseTag: << parameters.baseTag >>
+                tags: << tags >>
+                baseTag: << baseTag >>
             - test:
-                compose: << parameters.compose >>
+                compose: << compose >>
             - login:
-                login: << parameters.login >>
+                login: << login >>
             - push:
-                tags: << parameters.tags >>
+                tags: << tags >>
 
 jobs:
   get-fossa:
@@ -459,7 +459,7 @@ jobs:
     steps:
     - restore_cache:
         keys:
-        - musl-<< parameters.musl_version >>
+        - musl-<< musl_version >>
     - run:
         name: Download musl
         command: |
@@ -467,8 +467,8 @@ jobs:
             echo "SKIPPING..."
             exit 0
           fi
-          wget http://www.musl-libc.org/releases/musl-<< parameters.musl_version >>.tar.gz
-          mv musl-<< parameters.musl_version >>.tar.gz musl.tar.gz
+          wget http://www.musl-libc.org/releases/musl-<< musl_version >>.tar.gz
+          mv musl-<< musl_version >>.tar.gz musl.tar.gz
     - run:
         name: Unpack musl
         command: |
@@ -491,7 +491,7 @@ jobs:
           make
           make install
     - save_cache:
-        key: musl-<< parameters.musl_version >>
+        key: musl-<< musl_version >>
         paths:
         - /usr/local/musl
     - persist_to_workspace:
@@ -513,7 +513,7 @@ jobs:
           apk add --no-cache ca-certificates
     - restore_cache:
         keys:
-        - upx-<< parameters.upx_version >>
+        - upx-<< upx_version >>
     - run:
         name: Download UPX
         command: |
@@ -521,7 +521,7 @@ jobs:
             echo "SKIPPING..."
             exit 0
           fi
-          wget https://github.com/upx/upx/releases/download/v<< parameters.upx_version >>/upx-<< parameters.upx_version >>-amd64_linux.tar.xz
+          wget https://github.com/upx/upx/releases/download/v<< upx_version >>/upx-<< upx_version >>-amd64_linux.tar.xz
     - run:
         name: Unpack UPX
         command: |
@@ -531,12 +531,12 @@ jobs:
           fi
           mkdir -pv ./upx
           mkdir -pv ./upx-src
-          tar -Jxvf upx-<< parameters.upx_version >>-amd64_linux.tar.xz -C ./upx-src
+          tar -Jxvf upx-<< upx_version >>-amd64_linux.tar.xz -C ./upx-src
           cd ./upx-src
           cd *
           cp ./upx* ./../../upx
     - save_cache:
-        key: upx-<< parameters.upx_version >>
+        key: upx-<< upx_version >>
         paths:
         - ./upx/
     - persist_to_workspace:
