@@ -2,6 +2,9 @@ ARG GOVERSION=latest
 FROM circleci/golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
+COPY ./musl /usr/local/musl
+COPY ./upx /usr/local/bin
+
 ARG GOVERSION
 ARG BUILD_DATE
 ARG VCS_REF

@@ -1,17 +1,8 @@
-ARG GOVERSION=alpine3.8
-FROM gcc:8.2.0 as musl
-
-ADD musl.tar.gz /musl
-WORKDIR /musl
-RUN cd * && \
-    ./configure && \
-    make && \
-    make install
-
 FROM golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
-COPY --from=musl /usr/local/musl /usr/local/musl
+COPY ./musl /usr/local/musl
+COPY ./upx /usr/local/bin
 
 ARG GOVERSION
 ARG BUILD_DATE
