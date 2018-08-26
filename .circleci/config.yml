@@ -493,7 +493,7 @@ jobs:
     - save_cache:
         key: musl-{{ .Branch }}-<< parameters.musl_version >>
         paths:
-        - ./musl
+        - /usr/local/musl
     - persist_to_workspace:
         root: /usr/local
         paths:
@@ -542,7 +542,7 @@ jobs:
     - save_cache:
         key: upx-{{ .Branch }}-<< parameters.upx_version >>
         paths:
-        - ./upx
+        - ./upx/
     - persist_to_workspace:
         root: .
         paths:
