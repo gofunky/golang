@@ -480,8 +480,12 @@ jobs:
     - run:
         name: Download UPX
         command: |
-          mkdir -pv ./upx
           wget https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz
+    - run:
+        name: Unpack UPX
+        command: |
+          mkdir -pv ./upx
+          mkdir -pv ./upx-src
           tar -xzvf upx-${UPX_VERSION}-amd64_linux.tar.xz -C ./upx-src
           cd ./upx-src
           cd *
