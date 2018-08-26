@@ -458,14 +458,6 @@ jobs:
         keys:
         - musl-{{ .Branch }}-{{ .Environment.MUSLC_VERSION }}
     - run:
-        name: Install Certificates for Workspace
-        command: |
-          if [ -e "./musl" ]; then
-            echo "SKIPPING..."
-            exit 0
-          fi
-          apk add --no-cache ca-certificates
-    - run:
         name: Download musl
         command: |
           if [ -e "./musl" ]; then
@@ -512,7 +504,7 @@ jobs:
     - run:
         name: Install Certificates for Workspace
         command: |
-          apk add --no-cache ca-certificates tar
+          apk add --no-cache ca-certificates tar xz-utils
     - run:
         name: Download UPX
         command: |
