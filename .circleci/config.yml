@@ -558,6 +558,8 @@ workflows:
         context: docker-hub
   build-master:
     jobs:
+    - get-upx:
+        <<: *golang_master_filter
     - get-fossa:
         <<: *golang_master_filter
     - get-musl:
@@ -691,6 +693,8 @@ workflows:
         useArgs: false
   build-pull-request:
     jobs:
+    - get-upx:
+        <<: *golang_pr_filter
     - get-fossa:
         <<: *golang_pr_filter
     - get-musl:
