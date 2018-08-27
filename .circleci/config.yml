@@ -598,6 +598,13 @@ workflows:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
+        name: build_1.11.0
+        args: "GOVERSION=1.11.0"
+        tags: "gofunky/golang:1.11.0"
+    - dockerorb/build_test_push:
+        <<: *golang_docker
+        <<: *golang_master_filter
+        <<: *golang_login
         name: build_1.10.3
         args: "GOVERSION=1.10.3"
         tags: "gofunky/golang:1.10.3"
@@ -608,6 +615,13 @@ workflows:
         name: build_1.9.7
         args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7"
+    - dockerorb/build_test_push:
+        <<: *golang_docker
+        <<: *golang_master_filter
+        <<: *golang_login
+        name: build_1.11
+        args: "GOVERSION=1.11"
+        tags: "gofunky/golang:1.11"
     - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
@@ -675,6 +689,15 @@ workflows:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
+        name: alpine_1.11.0
+        args: "GOVERSION=1.11.0-alpine3.8"
+        tags: "gofunky/golang:1.11.0-alpine,gofunky/golang:1.11.0-alpine3.8"
+        file: "Dockerfile.alpine"
+        cache: true
+    - dockerorb/build_test_push:
+        <<: *golang_docker
+        <<: *golang_master_filter
+        <<: *golang_login
         name: alpine_1.10.3
         args: "GOVERSION=1.10.3-alpine3.8"
         tags: "gofunky/golang:1.10.3-alpine,gofunky/golang:1.10.3-alpine3.8"
@@ -687,6 +710,15 @@ workflows:
         name: alpine_1.9.7
         args: "GOVERSION=1.9.7-alpine3.8"
         tags: "gofunky/golang:1.9.7-alpine,gofunky/golang:1.9.7-alpine3.8"
+        file: "Dockerfile.alpine"
+        cache: true
+    - dockerorb/build_test_push:
+        <<: *golang_docker
+        <<: *golang_master_filter
+        <<: *golang_login
+        name: alpine_1.11
+        args: "GOVERSION=1.11-alpine3.8"
+        tags: "gofunky/golang:1.11-alpine,gofunky/golang:1.11-alpine3.8"
         file: "Dockerfile.alpine"
         cache: true
     - dockerorb/build_test_push:
@@ -728,6 +760,11 @@ workflows:
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: build_1.11.0
+        args: "GOVERSION=1.11.0"
+    - dockerorb/build_test:
+        <<: *golang_docker
+        <<: *golang_pr_filter
         name: build_1.10.3
         args: "GOVERSION=1.10.3"
     - dockerorb/build_test:
@@ -735,6 +772,11 @@ workflows:
         <<: *golang_pr_filter
         name: build_1.9.7
         args: "GOVERSION=1.9.7"
+    - dockerorb/build_test:
+        <<: *golang_docker
+        <<: *golang_pr_filter
+        name: build_1.11
+        args: "GOVERSION=1.11"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
@@ -785,6 +827,12 @@ workflows:
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
+        name: alpine_1.11.0
+        args: "GOVERSION=1.11.0-alpine3.8"
+        file: "Dockerfile.alpine"
+    - dockerorb/build_test:
+        <<: *golang_docker
+        <<: *golang_pr_filter
         name: alpine_1.10.3
         args: "GOVERSION=1.10.3-alpine3.8"
         file: "Dockerfile.alpine"
@@ -793,6 +841,12 @@ workflows:
         <<: *golang_pr_filter
         name: alpine_1.9.7
         args: "GOVERSION=1.9.7-alpine3.8"
+        file: "Dockerfile.alpine"
+    - dockerorb/build_test:
+        <<: *golang_docker
+        <<: *golang_pr_filter
+        name: alpine_1.11
+        args: "GOVERSION=1.11-alpine3.8"
         file: "Dockerfile.alpine"
     - dockerorb/build_test:
         <<: *golang_docker
