@@ -235,7 +235,7 @@ orbs:
                       buildarg=""
                       args="<< parameters.args >>,BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"`,VCS_REF=`git rev-parse --short HEAD`"
                       for arg in $args; do
-                        buildarg="${buildarg} --build_arg ${arg}"
+                        buildarg="${buildarg} --build-arg ${arg}"
                       done
                       build="docker build ${buildarg} --cache-from=<< parameters.base_tag >> -f << parameters.file >> -t << parameters.base_tag >> << parameters.path >>"
                       eval $build
@@ -248,7 +248,7 @@ orbs:
                       buildarg=""
                       args="<< parameters.args >>"
                       for arg in $args; do
-                        buildarg="${buildarg} --build_arg ${arg}"
+                        buildarg="${buildarg} --build-arg ${arg}"
                       done
                       build="docker build ${buildarg} --cache-from=<< parameters.base_tag >> -f << parameters.file >> -t << parameters.base_tag >> << parameters.path >>"
                       eval $build
@@ -263,7 +263,7 @@ orbs:
                 - run:
                     name: Build Docker image without arguments and with labels
                     command: |
-                      docker build --build_arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build_arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< parameters.base_tag >> -f << parameters.file >> -t << parameters.base_tag >> << parameters.path >>
+                      docker build --build-arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build-arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< parameters.base_tag >> -f << parameters.file >> -t << parameters.base_tag >> << parameters.path >>
             - unless:
                 condition: << parameters.add_labels >>
                 steps:
