@@ -6,9 +6,9 @@ ARG GOVERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends git rsync ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+RUN sudo apt-get update && \
+    sudo apt-get install -y --no-install-recommends git rsync ca-certificates && \
+    sudo rm -rf /var/lib/apt/lists/*
 
 COPY ./musl /usr/local/musl
 COPY ./upx /usr/local/bin
