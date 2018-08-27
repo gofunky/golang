@@ -7,7 +7,7 @@ ARG BUILD_DATE
 ARG VCS_REF
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git rsync ca-certificates && \
+    apt-get install -y --no-install-recommends git rsync ca-certificates gcc make binutils && \
     rm -rf /var/lib/apt/lists/*
 
 COPY ./musl /usr/local/musl

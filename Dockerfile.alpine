@@ -6,7 +6,7 @@ ARG GOVERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
-RUN apk add --no-cache --upgrade git rsync ca-certificates
+RUN apk add --no-cache --upgrade git rsync ca-certificates build-base gcc make binutils musl-dev file
 
 COPY ./upx /usr/local/bin
 

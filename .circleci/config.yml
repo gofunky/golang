@@ -605,9 +605,9 @@ workflows:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: build_1.10.3
-        args: "GOVERSION=1.10.3"
-        tags: "gofunky/golang:1.10.3"
+        name: build_1.10.4
+        args: "GOVERSION=1.10.4"
+        tags: "gofunky/golang:1.10.4"
     - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
@@ -698,9 +698,9 @@ workflows:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: alpine_1.10.3
-        args: "GOVERSION=1.10.3-alpine3.8"
-        tags: "gofunky/golang:1.10.3-alpine,gofunky/golang:1.10.3-alpine3.8"
+        name: alpine_1.10.4
+        args: "GOVERSION=1.10.4-alpine3.8"
+        tags: "gofunky/golang:1.10.4-alpine,gofunky/golang:1.10.4-alpine3.8"
         file: "Dockerfile.alpine"
         cache: true
     - dockerorb/build_test_push:
