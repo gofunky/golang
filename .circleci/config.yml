@@ -6,7 +6,7 @@ docker_login_params: &docker_login_params
 
 docker_arg_params: &docker_arg_params
   # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-  useArgs:
+  use_args:
     description: "Enable if you pass args"
     type: boolean
     default: false
@@ -20,7 +20,7 @@ docker_attach_params: &docker_attach_params
     description: "Attach workspace"
     type: boolean
     default: false
-  attachAt:
+  attach_at:
     description: "Where to attach the workspace"
     type: string
     default: "."
@@ -42,11 +42,11 @@ docker_build_params: &docker_build_params
     description: "Build path"
     type: string
     default: "."
-  addLabels:
+  add_labels:
     description: "Add default schema labels"
     type: boolean
     default: false
-  baseTag:
+  base_tag:
     description: "Docker base tag to use"
     type: string
     default: app
@@ -59,16 +59,16 @@ docker_tags_params: &docker_tags_params
 
 docker_build_args: &docker_build_args
   # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-  useArgs: << parameters.useArgs >>
+  use_args: << parameters.use_args >>
   args: << parameters.args >>
   file: << parameters.file >>
   cache: << parameters.cache >>
   prepare: << parameters.prepare >>
   path: << parameters.path >>
-  baseTag: << parameters.baseTag >>
+  base_tag: << parameters.base_tag >>
   attach: << parameters.attach >>
-  attachAt: << parameters.attachAt >>
-  addLabels: << parameters.addLabels >>
+  attach_at: << parameters.attach_at >>
+  add_labels: << parameters.add_labels >>
 
 docker_version_params: &docker_version_params
   docker_version:
@@ -141,7 +141,7 @@ orbs:
                 name: Update README
                 command: |
                   set -f
-                  URL=`git remote get-url origin`
+                  URL=`git remote get_url origin`
                   URL=`echo "$URL" | sed -e "s/^https:\/\///" -e "s/\.git//" | sed -e "s/^git@//"`
                   URL=`echo "$URL" | sed -r 's/github.com:/github.com\//g'`
                   set -- $URL
@@ -206,28 +206,28 @@ orbs:
             condition: << parameters.attach >>
             steps:
             - attach_workspace:
-                at: << parameters.attachAt >>
+                at: << parameters.attach_at >>
         - steps: << parameters.prepare >>
         - when:
             condition: << parameters.cache >>
             steps:
             - restore_cache:
                 keys:
-                - docker-<< parameters.path >>-<< parameters.file >>-<< parameters.baseTag >>-{{ .Branch }}
+                - docker-<< parameters.path >>-<< parameters.file >>-<< parameters.base_tag >>-{{ .Branch }}
                 paths:
-                - /caches/<< parameters.baseTag >>.tar
+                - /caches/<< parameters.base_tag >>.tar
             - run:
                 name: Load Docker image layer cache
                 command: |
                   set +o pipefail
-                  docker load -i /caches/<< parameters.baseTag >>.tar | true
+                  docker load -i /caches/<< parameters.base_tag >>.tar | true
         - when:
-            condition: << parameters.useArgs >>
+            condition: << parameters.use_args >>
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
             # matches: ['([a-zA-Z][\w]*=[\w-\/.:]+)(,[a-zA-Z][\w]*=[\w-\/.:]+)*', "<< parameters.args >>"]
             steps:
             - when:
-                condition: << parameters.addLabels >>
+                condition: << parameters.add_labels >>
                 steps:
                 - run:
                     name: Build Docker image with arguments and labels
@@ -235,12 +235,12 @@ orbs:
                       buildarg=""
                       args="<< parameters.args >>,BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"`,VCS_REF=`git rev-parse --short HEAD`"
                       for arg in $args; do
-                        buildarg="${buildarg} --build-arg ${arg}"
+                        buildarg="${buildarg} --build_arg ${arg}"
                       done
-                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>"
+                      build="docker build ${buildarg} --cache-from=<< parameters.base_tag >> -f << parameters.file >> -t << parameters.base_tag >> << parameters.path >>"
                       eval $build
             - unless:
-                condition: << parameters.addLabels >>
+                condition: << parameters.add_labels >>
                 steps:
                 - run:
                     name: Build Docker image with arguments and without labels
@@ -248,29 +248,29 @@ orbs:
                       buildarg=""
                       args="<< parameters.args >>"
                       for arg in $args; do
-                        buildarg="${buildarg} --build-arg ${arg}"
+                        buildarg="${buildarg} --build_arg ${arg}"
                       done
-                      build="docker build ${buildarg} --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>"
+                      build="docker build ${buildarg} --cache-from=<< parameters.base_tag >> -f << parameters.file >> -t << parameters.base_tag >> << parameters.path >>"
                       eval $build
         - unless:
-            condition: << parameters.useArgs >>
+            condition: << parameters.use_args >>
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
             # matches: ['([a-zA-Z][\w]*=[\w-\/.:]+)(,[a-zA-Z][\w]*=[\w-\/.:]+)*', "<< parameters.args >>"]
             steps:
             - when:
-                condition: << parameters.addLabels >>
+                condition: << parameters.add_labels >>
                 steps:
                 - run:
                     name: Build Docker image without arguments and with labels
                     command: |
-                      docker build --build-arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build-arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>
+                      docker build --build_arg BUILD_DATE=`date -u +\"%Y-%m-%dT%H:%M:%SZ\"` --build_arg VCS_REF=`git rev-parse --short HEAD` --cache-from=<< parameters.base_tag >> -f << parameters.file >> -t << parameters.base_tag >> << parameters.path >>
             - unless:
-                condition: << parameters.addLabels >>
+                condition: << parameters.add_labels >>
                 steps:
                 - run:
                     name: Build Docker image without arguments and without labels
                     command: |
-                      docker build --cache-from=<< parameters.baseTag >> -f << parameters.file >> -t << parameters.baseTag >> << parameters.path >>
+                      docker build --cache-from=<< parameters.base_tag >> -f << parameters.file >> -t << parameters.base_tag >> << parameters.path >>
         - when:
             condition: << parameters.cache >>
             steps:
@@ -278,15 +278,15 @@ orbs:
                 name: Save Docker image layer cache
                 command: |
                   mkdir -p /caches
-                  docker save -o /caches/<< parameters.baseTag >>.tar << parameters.baseTag >>
+                  docker save -o /caches/<< parameters.base_tag >>.tar << parameters.base_tag >>
             - save_cache:
-                key: docker-<< parameters.path >>-<< parameters.file >>-<< parameters.baseTag >>-{{ .Branch }}-{{ epoch }}
+                key: docker-<< parameters.path >>-<< parameters.file >>-<< parameters.base_tag >>-{{ .Branch }}-{{ epoch }}
                 paths:
-                - /caches/<< parameters.baseTag >>.tar
+                - /caches/<< parameters.base_tag >>.tar
       tag:
         parameters:
           <<: *docker_tags_params
-          baseTag:
+          base_tag:
             description: "Docker base tag to use"
             type: string
             default: app
@@ -296,7 +296,7 @@ orbs:
             command: |
               tags="<< parameters.tags >>"
               for tag in $tags; do
-                docker tag << parameters.baseTag >> "$tag"
+                docker tag << parameters.base_tag >> "$tag"
               done
       test:
         parameters:
@@ -345,7 +345,7 @@ orbs:
         - build:
             <<: *docker_build_args
 
-      build-test:
+      build_test:
         description: "Build Docker image"
         executor:
           name: default
@@ -365,11 +365,11 @@ orbs:
             <<: *docker_build_args
         - tag:
             tags: << parameters.tags >>
-            baseTag: << parameters.baseTag >>
+            base_tag: << parameters.base_tag >>
         - test:
             compose: << parameters.compose >>
 
-      build-push:
+      build_push:
         description: "Build and push Docker image"
         executor:
           name: default
@@ -391,13 +391,13 @@ orbs:
             steps:
             - tag:
                 tags: << parameters.tags >>
-                baseTag: << parameters.baseTag >>
+                base_tag: << parameters.base_tag >>
             - login:
                 login: << parameters.login >>
             - push:
                 tags: << parameters.tags >>
 
-      build-test-push:
+      build_test_push:
         description: "Build and push Docker image"
         executor:
           name: default
@@ -423,7 +423,7 @@ orbs:
             steps:
             - tag:
                 tags: << parameters.tags >>
-                baseTag: << parameters.baseTag >>
+                base_tag: << parameters.base_tag >>
             - test:
                 compose: << parameters.compose >>
             - login:
@@ -432,7 +432,7 @@ orbs:
                 tags: << parameters.tags >>
 
 jobs:
-  get-fossa:
+  get_fossa:
     docker:
     - image: bash
     steps:
@@ -448,7 +448,7 @@ jobs:
         root: /usr/local/bin
         paths:
         - fossa
-  get-musl:
+  get_musl:
     parameters:
       musl_version:
         description: "Musl version"
@@ -498,7 +498,7 @@ jobs:
         root: /usr/local
         paths:
         - musl
-  get-upx:
+  get_upx:
     parameters:
       upx_version:
         description: "UPX version"
@@ -547,15 +547,15 @@ jobs:
 golang_docker: &golang_docker
   context: docker-hub
   # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-  useArgs: true
-  baseTag: go
-  addLabels: true
+  use_args: true
+  base_tag: go
+  add_labels: true
   attach: true
   docker_version: 18.06.1
   requires:
-  - get-fossa
-  - get-upx
-  - get-musl
+  - get_fossa
+  - get_upx
+  - get_musl
   prepare:
   - run:
       name: Fix permissions
@@ -586,230 +586,230 @@ workflows:
         name: readme
         version: 1.1.0
         context: docker-hub
-  build-master:
+  build_master:
     jobs:
-    - get-upx:
+    - get_upx:
         <<: *golang_master_filter
-    - get-fossa:
+    - get_fossa:
         <<: *golang_master_filter
-    - get-musl:
+    - get_musl:
         <<: *golang_master_filter
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: build-1.10.3
+        name: build_1.10.3
         args: "GOVERSION=1.10.3"
         tags: "gofunky/golang:1.10.3"
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: build-1.9.7
+        name: build_1.9.7
         args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7"
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: build-1.10
+        name: build_1.10
         args: "GOVERSION=1.10"
         tags: "gofunky/golang:1.10"
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: build-1.9
+        name: build_1.9
         args: "GOVERSION=1.9"
         tags: "gofunky/golang:1.9"
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: build-latest
+        name: build_latest
         tags: "gofunky/golang:latest"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-        useArgs: false
-    - dockerorb/build-test-push:
+        use_args: false
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: circleci-1.10.3
+        name: circleci_1.10.3
         args: "GOVERSION=1.10.3"
         tags: "gofunky/golang:1.10.3-circleci"
         file: "Dockerfile.circleci"
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: circleci-1.9.7
+        name: circleci_1.9.7
         args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7-circleci"
         file: "Dockerfile.circleci"
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: circleci-1.10
+        name: circleci_1.10
         args: "GOVERSION=1.10"
         tags: "gofunky/golang:1.10-circleci"
         file: "Dockerfile.circleci"
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: circleci-1.9
+        name: circleci_1.9
         args: "GOVERSION=1.9"
         tags: "gofunky/golang:1.9-circleci"
         file: "Dockerfile.circleci"
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: circleci-latest
+        name: circleci_latest
         tags: "gofunky/golang:circleci"
         file: "Dockerfile.circleci"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-        useArgs: false
-    - dockerorb/build-test-push:
+        use_args: false
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: alpine-1.10.3
+        name: alpine_1.10.3
         args: "GOVERSION=1.10.3-alpine3.8"
         tags: "gofunky/golang:1.10.3-alpine,gofunky/golang:1.10.3-alpine3.8"
         file: "Dockerfile.alpine"
         cache: true
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: alpine-1.9.7
+        name: alpine_1.9.7
         args: "GOVERSION=1.9.7-alpine3.8"
         tags: "gofunky/golang:1.9.7-alpine,gofunky/golang:1.9.7-alpine3.8"
         file: "Dockerfile.alpine"
         cache: true
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: alpine-1.10
+        name: alpine_1.10
         args: "GOVERSION=1.10-alpine3.8"
         tags: "gofunky/golang:1.10-alpine,gofunky/golang:1.10-alpine3.8"
         file: "Dockerfile.alpine"
         cache: true
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: alpine-1.9
+        name: alpine_1.9
         args: "GOVERSION=1.9-alpine3.8"
         tags: "gofunky/golang:1.9-alpine,gofunky/golang:1.9-alpine3.8"
         file: "Dockerfile.alpine"
         cache: true
-    - dockerorb/build-test-push:
+    - dockerorb/build_test_push:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: alpine-latest
+        name: alpine_latest
         tags: "gofunky/golang:alpine3.8,gofunky/golang:alpine"
         file: "Dockerfile.alpine"
         cache: true
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-        useArgs: false
-  build-pull-request:
+        use_args: false
+  build_pull_request:
     jobs:
-    - get-upx:
+    - get_upx:
         <<: *golang_pr_filter
-    - get-fossa:
+    - get_fossa:
         <<: *golang_pr_filter
-    - get-musl:
+    - get_musl:
         <<: *golang_pr_filter
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build-1.10.3
+        name: build_1.10.3
         args: "GOVERSION=1.10.3"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build-1.9.7
+        name: build_1.9.7
         args: "GOVERSION=1.9.7"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build-1.10
+        name: build_1.10
         args: "GOVERSION=1.10"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build-1.9
+        name: build_1.9
         args: "GOVERSION=1.9"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build-latest
+        name: build_latest
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-        useArgs: false
-    - dockerorb/build-test:
+        use_args: false
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci-1.10.3
+        name: circleci_1.10.3
         args: "GOVERSION=1.10.3"
         file: "Dockerfile.circleci"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci-1.9.7
+        name: circleci_1.9.7
         args: "GOVERSION=1.9.7"
         file: "Dockerfile.circleci"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci-1.10
+        name: circleci_1.10
         args: "GOVERSION=1.10"
         file: "Dockerfile.circleci"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci-1.9
+        name: circleci_1.9
         args: "GOVERSION=1.9"
         file: "Dockerfile.circleci"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci-latest
+        name: circleci_latest
         file: "Dockerfile.circleci"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-        useArgs: false
-    - dockerorb/build-test:
+        use_args: false
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine-1.10.3
+        name: alpine_1.10.3
         args: "GOVERSION=1.10.3-alpine3.8"
         file: "Dockerfile.alpine"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine-1.9.7
+        name: alpine_1.9.7
         args: "GOVERSION=1.9.7-alpine3.8"
         file: "Dockerfile.alpine"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine-1.10
+        name: alpine_1.10
         args: "GOVERSION=1.10-alpine3.8"
         file: "Dockerfile.alpine"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine-1.9
+        name: alpine_1.9
         args: "GOVERSION=1.9-alpine3.8"
         file: "Dockerfile.alpine"
-    - dockerorb/build-test:
+    - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine-latest
+        name: alpine_latest
         file: "Dockerfile.alpine"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
-        useArgs: false
+        use_args: false
