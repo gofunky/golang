@@ -385,8 +385,9 @@ orbs:
         - build:
             <<: *docker_build_args
         - when:
+            condition: true
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
-            matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
+            # matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
             steps:
             - tag:
                 tags: << parameters.tags >>
@@ -416,8 +417,9 @@ orbs:
         - build:
             <<: *docker_build_args
         - when:
+            condition: true
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
-            matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
+            # matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
             steps:
             - tag:
                 tags: << parameters.tags >>
