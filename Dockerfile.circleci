@@ -2,6 +2,13 @@ ARG GOVERSION=latest
 FROM circleci/golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
+RUN mkdir -pv /go/tmp
+ENV GOTMPDIR /go/tmp
+
+COPY ./musl /usr/local/musl
+COPY ./upx /usr/local/bin
+COPY ./fossa /usr/local/bin/fossa
+
 ARG GOVERSION
 ARG BUILD_DATE
 ARG VCS_REF
@@ -9,10 +16,6 @@ ARG VCS_REF
 RUN sudo apt-get update && \
     sudo apt-get install -y --no-install-recommends git rsync ca-certificates gcc make binutils && \
     sudo rm -rf /var/lib/apt/lists/*
-
-COPY ./musl /usr/local/musl
-COPY ./upx /usr/local/bin
-COPY ./fossa /usr/local/bin/fossa
 
 RUN go get github.com/jstemmer/go-junit-report
 RUN go get github.com/haya14busa/goverage

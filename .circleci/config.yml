@@ -648,9 +648,17 @@ workflows:
         <<: *golang_docker
         <<: *golang_master_filter
         <<: *golang_login
-        name: circleci_1.10.3
-        args: "GOVERSION=1.10.3"
-        tags: "gofunky/golang:1.10.3-circleci"
+        name: circleci_1.11.0
+        args: "GOVERSION=1.11.0"
+        tags: "gofunky/golang:1.11.0-circleci"
+        file: "Dockerfile.circleci"
+    - dockerorb/build_test_push:
+        <<: *golang_docker
+        <<: *golang_master_filter
+        <<: *golang_login
+        name: circleci_1.10.4
+        args: "GOVERSION=1.10.4"
+        tags: "gofunky/golang:1.10.4-circleci"
         file: "Dockerfile.circleci"
     - dockerorb/build_test_push:
         <<: *golang_docker
@@ -659,6 +667,14 @@ workflows:
         name: circleci_1.9.7
         args: "GOVERSION=1.9.7"
         tags: "gofunky/golang:1.9.7-circleci"
+        file: "Dockerfile.circleci"
+    - dockerorb/build_test_push:
+        <<: *golang_docker
+        <<: *golang_master_filter
+        <<: *golang_login
+        name: circleci_1.11
+        args: "GOVERSION=1.11"
+        tags: "gofunky/golang:1.11-circleci"
         file: "Dockerfile.circleci"
     - dockerorb/build_test_push:
         <<: *golang_docker
@@ -765,8 +781,8 @@ workflows:
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: check_build_1.10.3
-        args: "GOVERSION=1.10.3"
+        name: check_build_1.10.4
+        args: "GOVERSION=1.10.4"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
@@ -796,14 +812,26 @@ workflows:
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: check_circleci_1.10.3
-        args: "GOVERSION=1.10.3"
+        name: check_circleci_1.11.0
+        args: "GOVERSION=1.11.0"
+        file: "Dockerfile.circleci"
+    - dockerorb/build_test:
+        <<: *golang_docker
+        <<: *golang_pr_filter
+        name: check_circleci_1.10.4
+        args: "GOVERSION=1.10.4"
         file: "Dockerfile.circleci"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
         name: check_circleci_1.9.7
         args: "GOVERSION=1.9.7"
+        file: "Dockerfile.circleci"
+    - dockerorb/build_test:
+        <<: *golang_docker
+        <<: *golang_pr_filter
+        name: check_circleci_1.11
+        args: "GOVERSION=1.11"
         file: "Dockerfile.circleci"
     - dockerorb/build_test:
         <<: *golang_docker
@@ -833,8 +861,8 @@ workflows:
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: check_alpine_1.10.3
-        args: "GOVERSION=1.10.3-alpine3.8"
+        name: check_alpine_1.10.4
+        args: "GOVERSION=1.10.4-alpine3.8"
         file: "Dockerfile.alpine"
     - dockerorb/build_test:
         <<: *golang_docker

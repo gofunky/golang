@@ -2,13 +2,16 @@ ARG GOVERSION=alpine3.8
 FROM golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
+RUN mkdir -pv /go/tmp
+ENV GOTMPDIR /go/tmp
+
+COPY ./upx /usr/local/bin
+
 ARG GOVERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
 RUN apk add --no-cache --upgrade git rsync ca-certificates build-base gcc make binutils musl-dev file
-
-COPY ./upx /usr/local/bin
 
 RUN go get github.com/golang/dep/cmd/dep
 RUN go get github.com/jstemmer/go-junit-report
