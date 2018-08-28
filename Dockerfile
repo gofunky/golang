@@ -2,6 +2,10 @@ ARG GOVERSION=latest
 FROM golang:${GOVERSION}
 MAINTAINER matfax <mat@fax.fyi>
 
+USER root
+RUN mkdir -pv /root
+ENV HOME /root
+
 RUN mkdir -pv /go/tmp
 ENV GOTMPDIR /go/tmp
 
