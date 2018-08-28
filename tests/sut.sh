@@ -1,7 +1,7 @@
 #!/bin/sh
 go version
 git --version
-rsync --version
+unison -version
 dep version
 go-junit-report --help
 goverage --help

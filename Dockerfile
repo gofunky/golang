@@ -14,7 +14,7 @@ ARG BUILD_DATE
 ARG VCS_REF
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git rsync ca-certificates gcc make binutils && \
+    apt-get install -y --no-install-recommends git unison ca-certificates gcc make binutils && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget -O - https://raw.githubusercontent.com/golang/dep/master/install.sh | sh

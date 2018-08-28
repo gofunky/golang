@@ -14,7 +14,7 @@ ARG BUILD_DATE
 ARG VCS_REF
 
 RUN sudo apt-get update && \
-    sudo apt-get install -y --no-install-recommends git rsync ca-certificates gcc make binutils && \
+    sudo apt-get install -y --no-install-recommends git unison ca-certificates gcc make binutils && \
     sudo rm -rf /var/lib/apt/lists/*
 
 RUN go get github.com/jstemmer/go-junit-report

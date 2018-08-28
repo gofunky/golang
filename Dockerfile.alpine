@@ -11,7 +11,7 @@ ARG GOVERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
-RUN apk add --no-cache --upgrade git rsync ca-certificates build-base gcc make binutils musl-dev file
+RUN apk add --no-cache --upgrade git unison ca-certificates build-base gcc make binutils musl-dev file
 
 RUN go get github.com/golang/dep/cmd/dep
 RUN go get github.com/jstemmer/go-junit-report
