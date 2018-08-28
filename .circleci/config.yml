@@ -323,7 +323,7 @@ orbs:
         parameters:
           <<: *docker_tags_params
         steps:
-        - deploy:
+        - run:
             name: Push application Docker image
             command: |
               tags="<< parameters.tags >>"
@@ -385,9 +385,8 @@ orbs:
         - build:
             <<: *docker_build_args
         - when:
-            condition: true
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
-            # matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
+            matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
             steps:
             - tag:
                 tags: << parameters.tags >>
@@ -417,9 +416,8 @@ orbs:
         - build:
             <<: *docker_build_args
         - when:
-            condition: true
             # Use this instead once CircleCI-Public/config-preview-sdk#15 is merged
-            # matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
+            matches: ['([\w-\/.:]+)?(,[\w-\/.:]+)*', "<< parameters.tags >>"]
             steps:
             - tag:
                 tags: << parameters.tags >>
@@ -760,110 +758,110 @@ workflows:
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build_1.11.0
+        name: check_build_1.11.0
         args: "GOVERSION=1.11.0"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build_1.10.3
+        name: check_build_1.10.3
         args: "GOVERSION=1.10.3"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build_1.9.7
+        name: check_build_1.9.7
         args: "GOVERSION=1.9.7"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build_1.11
+        name: check_build_1.11
         args: "GOVERSION=1.11"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build_1.10
+        name: check_build_1.10
         args: "GOVERSION=1.10"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build_1.9
+        name: check_build_1.9
         args: "GOVERSION=1.9"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: build_latest
+        name: check_build_latest
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         use_args: false
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci_1.10.3
+        name: check_circleci_1.10.3
         args: "GOVERSION=1.10.3"
         file: "Dockerfile.circleci"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci_1.9.7
+        name: check_circleci_1.9.7
         args: "GOVERSION=1.9.7"
         file: "Dockerfile.circleci"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci_1.10
+        name: check_circleci_1.10
         args: "GOVERSION=1.10"
         file: "Dockerfile.circleci"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci_1.9
+        name: check_circleci_1.9
         args: "GOVERSION=1.9"
         file: "Dockerfile.circleci"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: circleci_latest
+        name: check_circleci_latest
         file: "Dockerfile.circleci"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         use_args: false
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine_1.11.0
+        name: check_alpine_1.11.0
         args: "GOVERSION=1.11.0-alpine3.8"
         file: "Dockerfile.alpine"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine_1.10.3
+        name: check_alpine_1.10.3
         args: "GOVERSION=1.10.3-alpine3.8"
         file: "Dockerfile.alpine"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine_1.9.7
+        name: check_alpine_1.9.7
         args: "GOVERSION=1.9.7-alpine3.8"
         file: "Dockerfile.alpine"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine_1.11
+        name: check_alpine_1.11
         args: "GOVERSION=1.11-alpine3.8"
         file: "Dockerfile.alpine"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine_1.10
+        name: check_alpine_1.10
         args: "GOVERSION=1.10-alpine3.8"
         file: "Dockerfile.alpine"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine_1.9
+        name: check_alpine_1.9
         args: "GOVERSION=1.9-alpine3.8"
         file: "Dockerfile.alpine"
     - dockerorb/build_test:
         <<: *golang_docker
         <<: *golang_pr_filter
-        name: alpine_latest
+        name: check_alpine_latest
         file: "Dockerfile.alpine"
         # Remove this once CircleCI-Public/config-preview-sdk#15 is merged
         use_args: false
